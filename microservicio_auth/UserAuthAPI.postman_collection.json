@@ -11,37 +11,6 @@
 			"name": "Authentication",
 			"item": [
 				{
-					"name": "Registrar usuario normal",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"username\": \"testuser\",\n    \"email\": \"test@example.com\",\n    \"password\": \"password123\"\n}"
-						},
-						"url": {
-							"raw": "http://localhost:8081/api/auth/signup",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8081",
-							"path": [
-								"api",
-								"auth",
-								"signup"
-							]
-						},
-						"description": "Register a new user with normal poster role"
-					},
-					"response": []
-				},
-				{
 					"name": "Iniciar sesión moderador",
 					"request": {
 						"method": "POST",
@@ -173,12 +142,12 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "Bearer {{moderator_token}}"
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJGb3J1bU1hc3RlcjQyIiwicm9sZXMiOlsiUk9MRV9NT0RFUkFUT1IiXSwidXNlcklkIjoxLCJpYXQiOjE3NDI3ODc0MjYsImV4cCI6MTc0Mjg3MzgyNn0.LT2VjaLs_L3RXl6Wj4Ts11puVk11UUbj9n5j2lsDQQU"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"username\": \"GameLover123Updated\",\n    \"email\": \"gamelover.updated@example.com\",\n    \"role\": \"MODERATOR\"\n}"
+							"raw": "{\n    \"username\": \"GameLover123Updated\",\n    \"email\": \"gamelover.updated@example.com\",\n    \"role\": \"MODERATOR\",\n    \"password\": \"abc123\"\n}"
 						},
 						"url": {
 							"raw": "http://localhost:8081/api/users/3",

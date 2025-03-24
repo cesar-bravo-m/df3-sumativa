@@ -125,6 +125,30 @@
 					"response": []
 				},
 				{
+					"name": "Search",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/posts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"posts"
+							]
+						},
+						"description": "Retrieve all posts."
+					},
+					"response": []
+				},
+				{
 					"name": "Get Posts By Thread",
 					"request": {
 						"method": "GET",
@@ -315,6 +339,37 @@
 							"path": [
 								"api",
 								"threads"
+							]
+						},
+						"description": "Retrieve all threads in summary form."
+					},
+					"response": []
+				},
+				{
+					"name": "Search",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/threads/search?query=computación",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"threads",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "computación"
+								}
 							]
 						},
 						"description": "Retrieve all threads in summary form."
