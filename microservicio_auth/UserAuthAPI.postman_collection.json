@@ -1,0 +1,275 @@
+{
+	"info": {
+		"_postman_id": "0c92961c-a137-421a-acaf-06971d617144",
+		"name": "User Authentication API",
+		"description": "Collection for testing user authentication and management endpoints",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26434356"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Registrar usuario normal",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"testuser\",\n    \"email\": \"test@example.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8081/api/auth/signup",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"auth",
+								"signup"
+							]
+						},
+						"description": "Register a new user with normal poster role"
+					},
+					"response": []
+				},
+				{
+					"name": "Iniciar sesión moderador",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"ForumMaster42\",\n    \"password\": \"password\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8081/api/auth/signin",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"auth",
+								"signin"
+							]
+						},
+						"description": "Login as normal user (create a test environment variable to save the token)"
+					},
+					"response": []
+				},
+				{
+					"name": "Iniciar sesión usuario normal",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"TechGuru2000\",\n    \"password\": \"password\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8081/api/auth/signin",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"auth",
+								"signin"
+							]
+						},
+						"description": "Login as normal user (create a test environment variable to save the token)"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints related to authentication"
+		},
+		{
+			"name": "User Management",
+			"item": [
+				{
+					"name": "Todos los usuarios (sólo moderador)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{moderator_token}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8081/api/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"users"
+							]
+						},
+						"description": "Get all users (requires moderator role)"
+					},
+					"response": []
+				},
+				{
+					"name": "Usuario por ID (cualquiera si es moderador)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{moderator_token}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8081/api/users/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"users",
+								"2"
+							]
+						},
+						"description": "Moderator accessing another user's profile"
+					},
+					"response": []
+				},
+				{
+					"name": "Update usuario (cualquiera si es moderador)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{moderator_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"GameLover123Updated\",\n    \"email\": \"gamelover.updated@example.com\",\n    \"role\": \"MODERATOR\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8081/api/users/3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"users",
+								"3"
+							]
+						},
+						"description": "Moderator updating another user, including role change"
+					},
+					"response": []
+				},
+				{
+					"name": "Borrar usuario (sólo moderador)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{moderator_token}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8081/api/users/9",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"users",
+								"9"
+							]
+						},
+						"description": "Delete a user (requires moderator role)"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints related to user management operations"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Save tokens after successful login",
+					"if (pm.response.code === 200 && pm.request.url.path.includes('/api/auth/signin')) {",
+					"    var jsonData = pm.response.json();",
+					"    if (jsonData && jsonData.accessToken) {",
+					"        // Check if this is a moderator login or normal user login based on username from request body",
+					"        var requestBody = JSON.parse(pm.request.body.raw);",
+					"        if (requestBody.username === 'ForumMaster42' || jsonData.roles.includes('ROLE_MODERATOR')) {",
+					"            pm.environment.set('moderator_token', jsonData.accessToken);",
+					"            console.log('Saved moderator token');",
+					"        } else {",
+					"            pm.environment.set('normal_user_token', jsonData.accessToken);",
+					"            console.log('Saved normal user token');",
+					"        }",
+					"    }",
+					"}"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "normal_user_token",
+			"value": ""
+		},
+		{
+			"key": "moderator_token",
+			"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJGb3J1bU1hc3RlcjQyIiwiaWF0IjoxNzQyNzc2MDAxLCJleHAiOjE3NDI4NjI0MDF9.d4coRK-zPmC8Y9ByUb2KRPzxLLDV1rqLKy7LkTHbwqo"
+		}
+	]
+}

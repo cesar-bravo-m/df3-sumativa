@@ -1,0 +1,501 @@
+{
+	"info": {
+		"_postman_id": "a21bc108-899b-4d98-a45f-0c99805600fb",
+		"name": "SumativaPosts API",
+		"description": "Collection for testing the Posts microservice API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26434356"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Decode JWT Token (POST)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": \"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJUZWNoR3VydTIwMDAiLCJyb2xlcyI6WyJST0xFX05PUk1BTF9QT1NURVIiXSwidXNlcklkIjoyLCJpYXQiOjE3NDI3ODM4ODYsImV4cCI6MTc0Mjg3MDI4Nn0.IlpXgmoWaitGdOSVJJJzZgKJPHhvQOE1n-W2tCrv_d0\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/jwt/decode",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"jwt",
+								"decode"
+							]
+						},
+						"description": "Decode a JWT token using POST method."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints for JWT token operations"
+		},
+		{
+			"name": "Categories",
+			"item": [
+				{
+					"name": "Get All Categories",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/categories",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"categories"
+							]
+						},
+						"description": "Retrieve all categories."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Category By ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/categories/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"categories",
+								"1"
+							]
+						},
+						"description": "Retrieve a category by its ID."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints for category operations"
+		},
+		{
+			"name": "Posts",
+			"item": [
+				{
+					"name": "Get All Posts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/posts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"posts"
+							]
+						},
+						"description": "Retrieve all posts."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Posts By Thread",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/posts/thread/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"posts",
+								"thread",
+								"1"
+							]
+						},
+						"description": "Retrieve all posts for a specific thread."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Posts By User",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/posts/user/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"posts",
+								"user",
+								"1"
+							]
+						},
+						"description": "Retrieve all posts by a specific user."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Post By ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/posts/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"posts",
+								"1"
+							]
+						},
+						"description": "Retrieve a post by its ID."
+					},
+					"response": []
+				},
+				{
+					"name": "Create New Post",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"content\": \"This is a new post for testing\",\n    \"userId\": 1,\n    \"threadId\": 2\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/posts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"posts"
+							]
+						},
+						"description": "Create a new post."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Post",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"content\": \"This post was updated for testing\",\n    \"userId\": 1,\n    \"threadId\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/posts/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"posts",
+								"1"
+							]
+						},
+						"description": "Update an existing post."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Post",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/posts/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"posts",
+								"1"
+							]
+						},
+						"description": "Delete a post by its ID."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints for post operations"
+		},
+		{
+			"name": "Threads",
+			"item": [
+				{
+					"name": "Get All Threads",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/threads",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"threads"
+							]
+						},
+						"description": "Retrieve all threads in summary form."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Threads By Category",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/threads/category/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"threads",
+								"category",
+								"1"
+							]
+						},
+						"description": "Retrieve all threads by category ID."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Thread By ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/threads/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"threads",
+								"1"
+							]
+						},
+						"description": "Retrieve a thread by its ID, including all posts."
+					},
+					"response": []
+				},
+				{
+					"name": "Create New Thread",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"New Thread\",\n    \"userId\": 1,\n    \"categoryId\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/threads",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"threads"
+							]
+						},
+						"description": "Create a new thread."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Thread",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Updated Thread Title\",\n    \"userId\": 1,\n    \"categoryId\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/threads/13",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"threads",
+								"13"
+							]
+						},
+						"description": "Update an existing thread."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Thread",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/threads/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"threads",
+								"1"
+							]
+						},
+						"description": "Delete a thread by its ID."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints for thread operations"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "jwtToken",
+			"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJGb3J1bU1hc3RlcjQyIiwicm9sZXMiOlsiUk9MRV9NT0RFUkFUT1IiXSwidXNlcklkIjoxLCJpYXQiOjE3NDI3ODIzMjQsImV4cCI6MTc0Mjg2ODcyNH0.f3UByvw3r1oH9njde2mQOvZCWI0Xhd8KYp4ov7Hjrqg",
+			"type": "string"
+		}
+	]
+}
