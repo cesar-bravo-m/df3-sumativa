@@ -11,21 +11,29 @@ export interface User {
   providedIn: 'root'
 })
 export class AuthService {
-  private users: User[] = [
-    { username: 'admin@example.com', password: 'admin' }
-  ];
+  private users: User[] = [];
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
   constructor() {
+    // Load users from localStorage
+    const storedUsers = localStorage.getItem('users');
+    if (storedUsers) {
+      this.users = JSON.parse(storedUsers);
+    } else {
+      // Initialize with default admin user if no users exist
+      this.users = [{ username: 'admin@example.com', password: 'admin' }];
+      localStorage.setItem('users', JSON.stringify(this.users));
+    }
+
     const storedUser = localStorage.getItem('currentUser');
     if (storedUser) {
       this.currentUserSubject.next(JSON.parse(storedUser));
     }
   }
 
-  login(username: string, password: string): boolean {
-    const user = this.users.find(u => u.username === username && u.password === password);
+  login(email: string, password: string): boolean {
+    const user = this.users.find(u => u.email === email && u.password === password);
     if (user) {
       this.currentUserSubject.next(user);
       localStorage.setItem('currentUser', JSON.stringify(user));
@@ -35,27 +43,28 @@ export class AuthService {
   }
 
   register(username: string, password: string, email: string): boolean {
-    if (this.users.some(u => u.username === username)) {
+    if (this.users.some(u => u.email === email)) {
       return false;
     }
     const newUser: User = { username, password, email };
     this.users.push(newUser);
+    localStorage.setItem('users', JSON.stringify(this.users));
     return true;
   }
 
-  recoverPassword(username: string): string {
-    const user = this.users.find(u => u.username === username);
+  recoverPassword(email: string): string {
+    const user = this.users.find(u => u.email === email);
     if (user) {
       return '000'; // Dummy verification code
     }
     return '';
   }
 
-  updatePassword(username: string, newPassword: string): boolean {
-    const userIndex = this.users.findIndex(u => u.username === username);
+  updatePassword(email: string, newPassword: string): boolean {
+    const userIndex = this.users.findIndex(u => u.email === email);
     if (userIndex !== -1) {
       this.users[userIndex].password = newPassword;
-      if (this.currentUserSubject.value?.username === username) {
+      if (this.currentUserSubject.value?.email === email) {
         this.currentUserSubject.next({ ...this.users[userIndex] });
         localStorage.setItem('currentUser', JSON.stringify(this.users[userIndex]));
       }

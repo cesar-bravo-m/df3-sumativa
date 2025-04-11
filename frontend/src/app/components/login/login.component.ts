@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -17,7 +18,8 @@ export class LoginComponent {
 
   constructor(
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -30,25 +32,15 @@ export class LoginComponent {
       this.isLoading = true;
       this.errorMessage = '';
 
-      // Simulate API call
-      setTimeout(() => {
+      const email = this.loginForm.get('email')?.value;
+      const password = this.loginForm.get('password')?.value;
+
+      if (this.authService.login(email, password)) {
+        this.router.navigate(['/forum']);
+      } else {
+        this.errorMessage = 'Correo electrónico o contraseña inválidos';
         this.isLoading = false;
-
-        // For demo purposes, accept any valid email/password
-        if (this.loginForm.get('email')?.valid && this.loginForm.get('password')?.valid) {
-          // Store user info in localStorage for demo
-          localStorage.setItem('currentUser', JSON.stringify({
-            email: this.loginForm.get('email')?.value,
-            name: 'Usuario Demo',
-            avatar: 'https://ui-avatars.com/api/?name=Usuario+Demo&background=667eea&color=fff'
-          }));
-
-          // Redirect to forum page
-          this.router.navigate(['/forum']);
-        } else {
-          this.errorMessage = 'Correo electrónico o contraseña inválidos';
-        }
-      }, 1000);
+      }
     } else {
       this.errorMessage = 'Por favor completa todos los campos correctamente';
     }
