@@ -1,0 +1,80 @@
+<div class="forum-container">
+  <div class="forum-header">
+    <div class="header-content">
+      <h1>Foro Comunitario</h1>
+      <p>Únete a la discusión y comparte tus pensamientos con nuestra comunidad</p>
+    </div>
+    <div class="header-actions">
+      <app-user-avatar></app-user-avatar>
+    </div>
+  </div>
+
+  <div class="forum-categories">
+    <div class="category" *ngFor="let category of categories">
+      <div class="category-header" (click)="toggleCategory(category.id)">
+        <div class="category-title">
+          <i class="material-icons category-toggle">{{category.isExpanded ? 'expand_less' : 'expand_more'}}</i>
+          <i class="material-icons category-icon">{{category.icon}}</i>
+          <h2>{{category.name}}</h2>
+        </div>
+        <div class="category-stats">
+          <span>Temas: {{category.threads.length}}</span>
+        </div>
+      </div>
+
+      <div class="category-content" [class.expanded]="category.isExpanded">
+        <div class="category-description">
+          {{category.description}}
+        </div>
+
+        <div class="category-actions">
+          <button class="new-thread-btn" (click)="createNewThread(category.id)">
+            <i class="material-icons">add</i>
+            Nuevo Tema
+          </button>
+        </div>
+
+        <table class="threads-table">
+          <thead>
+            <tr>
+              <th class="status-col">Estado</th>
+              <th class="title-col">Título del Tema</th>
+              <th class="author-col">Autor</th>
+              <th class="replies-col">Respuestas</th>
+              <th class="views-col">Vistas</th>
+              <th class="last-activity-col">Última Actividad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let thread of category.threads" [ngClass]="{'new-thread': isNewThread(thread), 'hot-thread': isHotThread(thread)}">
+              <td class="status-col">
+                <div class="thread-status">
+                  <i class="material-icons" *ngIf="isNewThread(thread)" title="Tema Nuevo">fiber_new</i>
+                  <i class="material-icons" *ngIf="isHotThread(thread)" title="Tema Popular">local_fire_department</i>
+                  <i class="material-icons" *ngIf="thread.isSticky" title="Tema Fijo">push_pin</i>
+                </div>
+              </td>
+              <td class="title-col">
+                <a [routerLink]="['/thread', thread.id]">{{thread.title}}</a>
+              </td>
+              <td class="author-col">{{thread.author}}</td>
+              <td class="replies-col">{{thread.replies}}</td>
+              <td class="views-col">{{thread.views}}</td>
+              <td class="last-activity-col">{{thread.lastActivity}}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="pagination">
+          <button class="page-btn" [disabled]="currentPage === 1">
+            <i class="material-icons">chevron_left</i>
+          </button>
+          <span class="page-info">Página {{currentPage}} de {{totalPages}}</span>
+          <button class="page-btn" [disabled]="currentPage === totalPages">
+            <i class="material-icons">chevron_right</i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

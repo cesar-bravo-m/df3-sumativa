@@ -1,0 +1,26 @@
+/* Global styles */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9fa;
+  color: #333;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  text-decoration: none;
+  color: #667eea;
+  cursor: pointer;
+
+  &:hover {
+    color: #764ba2;
+  }
+}
+
+button {
+  cursor: pointer;
+}

@@ -1,0 +1,79 @@
+<div class="profile-container">
+  <div class="profile-card">
+    <div class="profile-header">
+      <h2>Configuración del Perfil</h2>
+      <a routerLink="/forum">
+        <button class="logout-btn">Volver al foro</button>
+      </a>
+    </div>
+
+    <div class="user-info">
+      <div class="info-item">
+        <span class="label">Nombre de usuario:</span>
+        <span class="value">{{ currentUser?.username }}</span>
+      </div>
+      <div class="info-item" *ngIf="currentUser?.email">
+        <span class="label">Correo electrónico:</span>
+        <span class="value">{{ currentUser?.email }}</span>
+      </div>
+    </div>
+
+    <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="profile-form">
+      <div class="form-group">
+        <label for="currentPassword">Contraseña Actual</label>
+        <input
+          type="password"
+          id="currentPassword"
+          formControlName="currentPassword"
+          placeholder="Ingresa tu contraseña actual"
+          class="form-control"
+        >
+        <div class="error" *ngIf="profileForm.get('currentPassword')?.touched && profileForm.get('currentPassword')?.errors?.['required']">
+          La contraseña actual es requerida
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="newPassword">Nueva Contraseña</label>
+        <input
+          type="password"
+          id="newPassword"
+          formControlName="newPassword"
+          placeholder="Ingresa la nueva contraseña"
+          class="form-control"
+        >
+        <div class="password-requirements" *ngIf="profileForm.get('newPassword')?.touched">
+          <div class="error" *ngFor="let error of getPasswordErrors()">
+            {{ error }}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword">Confirmar Nueva Contraseña</label>
+        <input
+          type="password"
+          id="confirmPassword"
+          formControlName="confirmPassword"
+          placeholder="Confirma la nueva contraseña"
+          class="form-control"
+        >
+        <div class="error" *ngIf="profileForm.get('confirmPassword')?.touched && profileForm.errors?.['mismatch']">
+          Las contraseñas no coinciden
+        </div>
+      </div>
+
+      <div class="error-message" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <div class="success-message" *ngIf="successMessage">
+        {{ successMessage }}
+      </div>
+
+      <button type="submit" class="submit-btn" [disabled]="!profileForm.valid">
+        Actualizar Contraseña
+      </button>
+    </form>
+  </div>
+</div>

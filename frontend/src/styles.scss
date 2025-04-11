@@ -1,0 +1,130 @@
+/* Global styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #333;
+}
+
+/* Responsive breakpoints */
+:root {
+  --mobile: 480px;
+  --tablet: 768px;
+  --desktop: 1024px;
+  --large-desktop: 1200px;
+}
+
+/* Responsive font sizes */
+@media (max-width: 480px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+/* Responsive container */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+/* Responsive grid system */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -15px;
+}
+
+.col {
+  flex: 1 0 0%;
+  padding: 0 15px;
+}
+
+/* Responsive utilities */
+@media (max-width: 768px) {
+  .hide-on-mobile {
+    display: none !important;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .hide-on-tablet {
+    display: none !important;
+  }
+}
+
+@media (min-width: 1025px) {
+  .hide-on-desktop {
+    display: none !important;
+  }
+}
+
+/* Responsive spacing */
+@media (max-width: 480px) {
+  .p-mobile-0 { padding: 0 !important; }
+  .p-mobile-1 { padding: 0.25rem !important; }
+  .p-mobile-2 { padding: 0.5rem !important; }
+  .p-mobile-3 { padding: 1rem !important; }
+  .p-mobile-4 { padding: 1.5rem !important; }
+  .p-mobile-5 { padding: 3rem !important; }
+
+  .m-mobile-0 { margin: 0 !important; }
+  .m-mobile-1 { margin: 0.25rem !important; }
+  .m-mobile-2 { margin: 0.5rem !important; }
+  .m-mobile-3 { margin: 1rem !important; }
+  .m-mobile-4 { margin: 1.5rem !important; }
+  .m-mobile-5 { margin: 3rem !important; }
+}
+
+/* Responsive text alignment */
+@media (max-width: 480px) {
+  .text-mobile-center {
+    text-align: center !important;
+  }
+
+  .text-mobile-left {
+    text-align: left !important;
+  }
+
+  .text-mobile-right {
+    text-align: right !important;
+  }
+}
+
+/* Responsive flex direction */
+@media (max-width: 480px) {
+  .flex-mobile-column {
+    flex-direction: column !important;
+  }
+
+  .flex-mobile-row {
+    flex-direction: row !important;
+  }
+}
+
+/* Responsive width */
+@media (max-width: 480px) {
+  .w-mobile-100 {
+    width: 100% !important;
+  }
+
+  .w-mobile-75 {
+    width: 75% !important;
+  }
+
+  .w-mobile-50 {
+    width: 50% !important;
+  }
+
+  .w-mobile-25 {
+    width: 25% !important;
+  }
+}
