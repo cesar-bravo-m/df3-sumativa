@@ -22,8 +22,18 @@ export class RegisterComponent {
     private router: Router
   ) {
     this.registerForm = this.fb.group({
-      username: ['', [Validators.required, Validators.minLength(3)]],
-      email: ['', [Validators.required, Validators.email]],
+      username: ['', [
+        Validators.required,
+        Validators.minLength(3),
+        Validators.maxLength(12),
+        Validators.pattern('^[a-zA-Z0-9]+$')
+      ]],
+      email: ['', [
+        Validators.required,
+        Validators.email,
+        this.emailWithTldValidator(),
+        this.allowedTldsValidator()
+      ]],
       password: ['', [Validators.required, ValidationService.passwordValidator]],
       confirmPassword: ['', [Validators.required]]
     }, { validator: this.passwordMatchValidator });
@@ -33,6 +43,60 @@ export class RegisterComponent {
     return g.get('password')?.value === g.get('confirmPassword')?.value
       ? null
       : { mismatch: true };
+  }
+
+  emailWithTldValidator() {
+    return (control: any) => {
+      if (!control.value) {
+        return null;
+      }
+
+      const email = control.value;
+      const parts = email.split('@');
+
+      if (parts.length !== 2) {
+        return { invalidFormat: true };
+      }
+
+      const domain = parts[1];
+      const domainParts = domain.split('.');
+
+      if (domainParts.length < 2) {
+        return { noTld: true };
+      }
+
+      return null;
+    };
+  }
+
+  allowedTldsValidator() {
+    return (control: any) => {
+      if (!control.value) {
+        return null;
+      }
+
+      const email = control.value;
+      const parts = email.split('@');
+
+      if (parts.length !== 2) {
+        return null;
+      }
+
+      const domain = parts[1];
+      const domainParts = domain.split('.');
+
+      if (domainParts.length < 2) {
+        return null;
+      }
+
+      const tld = domainParts[domainParts.length - 1].toLowerCase();
+
+      if (['com', 'cl', 'net'].includes(tld)) {
+        return null;
+      }
+
+      return { invalidTld: true };
+    };
   }
 
   onSubmit(): void {
@@ -65,6 +129,56 @@ export class RegisterComponent {
       }
       if (passwordControl.errors['requireSpecialChar']) {
         errors.push('La contraseña debe contener al menos un carácter especial');
+      }
+    }
+
+    return errors;
+  }
+
+  getUsernameErrors(): string[] {
+    const errors: string[] = [];
+    const usernameControl = this.registerForm.get('username');
+
+    if (usernameControl?.errors) {
+      if (usernameControl.errors['required']) {
+        errors.push('El nombre de usuario es requerido');
+      }
+      if (usernameControl.errors['minlength']) {
+        errors.push('El nombre de usuario debe tener al menos 3 caracteres');
+      }
+      if (usernameControl.errors['maxlength']) {
+        errors.push('El nombre de usuario no debe exceder 12 caracteres');
+      }
+      if (usernameControl.errors['pattern']) {
+        errors.push('El nombre de usuario no puede contener caracteres especiales');
+      }
+    }
+
+    return errors;
+  }
+
+  getEmailErrors(): string[] {
+    const errors: string[] = [];
+    const emailControl = this.registerForm.get('email');
+
+    debugger
+    if (emailControl?.errors) {
+      if (emailControl.errors['required']) {
+        errors.push('El correo electrónico es requerido');
+      }
+      if (emailControl.errors['email']) {
+        errors.push('Por favor ingresa un correo electrónico válido');
+      }
+      if (emailControl.errors['invalidFormat']) {
+        errors.push('El formato del correo electrónico no es válido');
+      }
+      if (emailControl.errors['noTld']) {
+        errors.push('El correo electrónico debe incluir un dominio con TLD (ej: .com, .cl, .net)');
+      }
+      debugger
+      if (emailControl.errors['invalidTld']) {
+        debugger
+        errors.push('Solo se permiten dominios .com, .cl o .net');
       }
     }
 
