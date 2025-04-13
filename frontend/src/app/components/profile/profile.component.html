@@ -24,14 +24,10 @@
           placeholder="Ingresa tu nombre de usuario"
           class="form-control"
         >
-        <div class="error" *ngIf="profileForm.get('username')?.touched && profileForm.get('username')?.errors?.['required']">
-          El nombre de usuario es requerido
-        </div>
-        <div class="error" *ngIf="profileForm.get('username')?.touched && profileForm.get('username')?.errors?.['minlength']">
-          El nombre de usuario debe tener al menos 3 caracteres
-        </div>
-        <div class="error" *ngIf="profileForm.get('username')?.touched && profileForm.get('username')?.errors?.['maxlength']">
-          El nombre de usuario no debe exceder 20 caracteres
+        <div class="error" *ngIf="profileForm.get('username')?.touched">
+          <div *ngFor="let error of getUsernameErrors()">
+            {{ error }}
+          </div>
         </div>
       </div>
 

@@ -24,7 +24,12 @@ export class ProfileComponent implements OnInit {
     private router: Router
   ) {
     this.profileForm = this.fb.group({
-      username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(20)]],
+      username: ['', [
+        Validators.required,
+        Validators.minLength(3),
+        Validators.maxLength(12),
+        Validators.pattern('^[a-zA-Z0-9]+$')
+      ]],
       currentPassword: ['', [Validators.required]],
       newPassword: [''],
       confirmPassword: ['']
@@ -127,6 +132,28 @@ export class ProfileComponent implements OnInit {
       }
       if (passwordControl.errors['requireSpecialChar']) {
         errors.push('La contraseña debe contener al menos un carácter especial');
+      }
+    }
+
+    return errors;
+  }
+
+  getUsernameErrors(): string[] {
+    const errors: string[] = [];
+    const usernameControl = this.profileForm.get('username');
+
+    if (usernameControl?.errors) {
+      if (usernameControl.errors['required']) {
+        errors.push('El nombre de usuario es requerido');
+      }
+      if (usernameControl.errors['minlength']) {
+        errors.push('El nombre de usuario debe tener al menos 3 caracteres');
+      }
+      if (usernameControl.errors['maxlength']) {
+        errors.push('El nombre de usuario no debe exceder 12 caracteres');
+      }
+      if (usernameControl.errors['pattern']) {
+        errors.push('El nombre de usuario no puede contener caracteres especiales');
       }
     }
 
