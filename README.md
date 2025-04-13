@@ -15,3 +15,8 @@
 - Frontend: Angular
 - Base de datos: Oracle (en cloud)
 - Contenedores: Docker
+
+## Datos de prueba
+
+Usuario: admin
+Contraseña: admin
