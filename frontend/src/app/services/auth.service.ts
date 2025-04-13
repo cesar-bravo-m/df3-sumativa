@@ -77,6 +77,20 @@ export class AuthService {
     return false;
   }
 
+  updateUsername(email: string, newUsername: string): boolean {
+    const userIndex = this.users.findIndex(u => u.email === email);
+    if (userIndex !== -1) {
+      this.users[userIndex].username = newUsername;
+      if (this.currentUserSubject.value?.email === email) {
+        this.currentUserSubject.next({ ...this.users[userIndex] });
+        localStorage.setItem('currentUser', JSON.stringify(this.users[userIndex]));
+      }
+      localStorage.setItem('users', JSON.stringify(this.users));
+      return true;
+    }
+    return false;
+  }
+
   logout(): void {
     this.currentUserSubject.next(null);
     localStorage.removeItem('currentUser');

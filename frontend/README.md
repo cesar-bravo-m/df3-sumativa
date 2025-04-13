@@ -57,3 +57,54 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+## Docker Setup
+
+This project includes Docker configuration for easy deployment and consistency across environments.
+
+### Prerequisites
+
+- Docker
+- Docker Compose (optional, but recommended)
+
+### Building and Running with Docker
+
+#### Using Docker Compose (Recommended)
+
+1. Build and start the container:
+   ```bash
+   docker-compose up -d
+   ```
+
+2. Access the application at http://localhost
+
+3. To stop the container:
+   ```bash
+   docker-compose down
+   ```
+
+#### Using Docker Directly
+
+1. Build the Docker image:
+   ```bash
+   docker build -t bbs-forum-frontend .
+   ```
+
+2. Run the container:
+   ```bash
+   docker run -p 80:80 -d bbs-forum-frontend
+   ```
+
+3. Access the application at http://localhost
+
+4. To stop the container:
+   ```bash
+   docker stop $(docker ps -q --filter ancestor=bbs-forum-frontend)
+   ```
+
+### Docker Configuration
+
+- `Dockerfile`: Multi-stage build that compiles the Angular application and serves it using Nginx
+- `nginx.conf`: Nginx configuration optimized for serving Angular applications
+- `.dockerignore`: Excludes unnecessary files from the Docker build context
+- `docker-compose.yml`: Simplifies running the application with Docker

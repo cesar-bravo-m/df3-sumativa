@@ -24,9 +24,10 @@ export class ProfileComponent implements OnInit {
     private router: Router
   ) {
     this.profileForm = this.fb.group({
+      username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(20)]],
       currentPassword: ['', [Validators.required]],
-      newPassword: ['', [Validators.required, ValidationService.passwordValidator]],
-      confirmPassword: ['', [Validators.required]]
+      newPassword: [''],
+      confirmPassword: ['']
     }, { validator: this.passwordMatchValidator });
   }
 
@@ -37,27 +38,68 @@ export class ProfileComponent implements OnInit {
         return;
       }
       this.currentUser = user;
+      this.profileForm.patchValue({
+        username: user.username
+      });
+    });
+
+    this.profileForm.get('newPassword')?.valueChanges.subscribe(value => {
+      const confirmPasswordControl = this.profileForm.get('confirmPassword');
+      if (value && value.length > 0) {
+        confirmPasswordControl?.setValidators([Validators.required]);
+      } else {
+        confirmPasswordControl?.clearValidators();
+      }
+      confirmPasswordControl?.updateValueAndValidity();
     });
   }
 
   passwordMatchValidator(g: FormGroup) {
-    return g.get('newPassword')?.value === g.get('confirmPassword')?.value
-      ? null
-      : { mismatch: true };
+    const newPassword = g.get('newPassword')?.value;
+    const confirmPassword = g.get('confirmPassword')?.value;
+
+    if (newPassword && newPassword.length > 0) {
+      return newPassword === confirmPassword
+        ? null
+        : { mismatch: true };
+    }
+    return null;
   }
 
   onSubmit(): void {
     if (this.profileForm.valid) {
-      const { currentPassword, newPassword } = this.profileForm.value;
+      const { username, currentPassword, newPassword } = this.profileForm.value;
 
       if (this.authService.login(this.currentUser.email, currentPassword)) {
-        if (this.authService.updatePassword(this.currentUser.email, newPassword)) {
-          this.successMessage = 'Contraseña actualizada exitosamente';
+        let updateSuccess = true;
+
+        if (username !== this.currentUser.username) {
+          if (!this.authService.updateUsername(this.currentUser.email, username)) {
+            this.errorMessage = 'Error al actualizar el nombre de usuario';
+            this.successMessage = '';
+            updateSuccess = false;
+          }
+        }
+
+        if (newPassword && newPassword.length > 0 && updateSuccess) {
+          if (this.authService.updatePassword(this.currentUser.email, newPassword)) {
+            this.successMessage = 'Perfil actualizado exitosamente';
+            this.errorMessage = '';
+            this.profileForm.patchValue({
+              currentPassword: '',
+              newPassword: '',
+              confirmPassword: ''
+            });
+          } else {
+            this.errorMessage = 'Error al actualizar la contraseña';
+            this.successMessage = '';
+          }
+        } else if (updateSuccess) {
+          this.successMessage = 'Nombre de usuario actualizado exitosamente';
           this.errorMessage = '';
-          this.profileForm.reset();
-        } else {
-          this.errorMessage = 'Error al actualizar la contraseña';
-          this.successMessage = '';
+          this.profileForm.patchValue({
+            currentPassword: ''
+          });
         }
       } else {
         this.errorMessage = 'La contraseña actual es incorrecta';

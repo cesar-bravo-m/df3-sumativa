@@ -8,10 +8,6 @@
     </div>
 
     <div class="user-info">
-      <div class="info-item">
-        <span class="label">Nombre de usuario:</span>
-        <span class="value">{{ currentUser?.username }}</span>
-      </div>
       <div class="info-item" *ngIf="currentUser?.email">
         <span class="label">Correo electrónico:</span>
         <span class="value">{{ currentUser?.email }}</span>
@@ -20,7 +16,27 @@
 
     <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="profile-form">
       <div class="form-group">
-        <label for="currentPassword">Contraseña Actual</label>
+        <label for="username">Nombre de usuario <span class="required">*</span></label>
+        <input
+          type="text"
+          id="username"
+          formControlName="username"
+          placeholder="Ingresa tu nombre de usuario"
+          class="form-control"
+        >
+        <div class="error" *ngIf="profileForm.get('username')?.touched && profileForm.get('username')?.errors?.['required']">
+          El nombre de usuario es requerido
+        </div>
+        <div class="error" *ngIf="profileForm.get('username')?.touched && profileForm.get('username')?.errors?.['minlength']">
+          El nombre de usuario debe tener al menos 3 caracteres
+        </div>
+        <div class="error" *ngIf="profileForm.get('username')?.touched && profileForm.get('username')?.errors?.['maxlength']">
+          El nombre de usuario no debe exceder 20 caracteres
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="currentPassword">Contraseña Actual <span class="required">*</span></label>
         <input
           type="password"
           id="currentPassword"
@@ -34,7 +50,7 @@
       </div>
 
       <div class="form-group">
-        <label for="newPassword">Nueva Contraseña</label>
+        <label for="newPassword">Nueva Contraseña (opcional)</label>
         <input
           type="password"
           id="newPassword"
@@ -42,7 +58,7 @@
           placeholder="Ingresa la nueva contraseña"
           class="form-control"
         >
-        <div class="password-requirements" *ngIf="profileForm.get('newPassword')?.touched">
+        <div class="password-requirements" *ngIf="profileForm.get('newPassword')?.touched && profileForm.get('newPassword')?.value">
           <div class="error" *ngFor="let error of getPasswordErrors()">
             {{ error }}
           </div>
@@ -50,7 +66,7 @@
       </div>
 
       <div class="form-group">
-        <label for="confirmPassword">Confirmar Nueva Contraseña</label>
+        <label for="confirmPassword">Confirmar Nueva Contraseña <span class="required" *ngIf="profileForm.get('newPassword')?.value">*</span></label>
         <input
           type="password"
           id="confirmPassword"
@@ -72,7 +88,7 @@
       </div>
 
       <button type="submit" class="submit-btn" [disabled]="!profileForm.valid">
-        Actualizar Contraseña
+        Actualizar Perfil
       </button>
     </form>
   </div>
