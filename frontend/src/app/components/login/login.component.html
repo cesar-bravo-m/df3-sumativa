@@ -15,8 +15,9 @@
           [ngClass]="{'is-invalid': loginForm.get('email')?.invalid && loginForm.get('email')?.touched}"
         >
         <div class="error-message" *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
-          <span *ngIf="loginForm.get('email')?.errors?.['required']">El correo electrónico es requerido</span>
-          <span *ngIf="loginForm.get('email')?.errors?.['email']">Por favor ingresa un correo electrónico válido</span>
+          <div *ngFor="let error of getEmailErrors()">
+            {{ error }}
+          </div>
         </div>
       </div>
 

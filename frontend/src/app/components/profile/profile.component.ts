@@ -138,6 +138,32 @@ export class ProfileComponent implements OnInit {
     return errors;
   }
 
+  // Individual password validation checks
+  hasMinLength(): boolean {
+    const password = this.profileForm.get('newPassword')?.value || '';
+    return password.length >= 8;
+  }
+
+  hasMaxLength(): boolean {
+    const password = this.profileForm.get('newPassword')?.value || '';
+    return password.length <= 32;
+  }
+
+  hasLetter(): boolean {
+    const password = this.profileForm.get('newPassword')?.value || '';
+    return /[A-Za-z]/.test(password);
+  }
+
+  hasNumber(): boolean {
+    const password = this.profileForm.get('newPassword')?.value || '';
+    return /[0-9]/.test(password);
+  }
+
+  hasSpecialChar(): boolean {
+    const password = this.profileForm.get('newPassword')?.value || '';
+    return /[!@#$%^&*(),.?":{}|<>]/.test(password);
+  }
+
   getUsernameErrors(): string[] {
     const errors: string[] = [];
     const usernameControl = this.profileForm.get('username');

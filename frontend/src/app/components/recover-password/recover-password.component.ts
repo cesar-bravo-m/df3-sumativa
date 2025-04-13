@@ -98,4 +98,30 @@ export class RecoverPasswordComponent {
 
     return errors;
   }
+
+  // Individual password validation checks
+  hasMinLength(): boolean {
+    const password = this.newPasswordForm.get('password')?.value || '';
+    return password.length >= 8;
+  }
+
+  hasMaxLength(): boolean {
+    const password = this.newPasswordForm.get('password')?.value || '';
+    return password.length <= 32;
+  }
+
+  hasLetter(): boolean {
+    const password = this.newPasswordForm.get('password')?.value || '';
+    return /[A-Za-z]/.test(password);
+  }
+
+  hasNumber(): boolean {
+    const password = this.newPasswordForm.get('password')?.value || '';
+    return /[0-9]/.test(password);
+  }
+
+  hasSpecialChar(): boolean {
+    const password = this.newPasswordForm.get('password')?.value || '';
+    return /[!@#$%^&*(),.?":{}|<>]/.test(password);
+  }
 }
