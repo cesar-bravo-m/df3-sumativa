@@ -135,13 +135,19 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/api/posts",
+							"raw": "{{baseUrl}}/api/posts?query=computación",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
 								"posts"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "computación"
+								}
 							]
 						},
 						"description": "Retrieve all posts."
@@ -549,7 +555,7 @@
 		},
 		{
 			"key": "jwtToken",
-			"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJGb3J1bU1hc3RlcjQyIiwicm9sZXMiOlsiUk9MRV9NT0RFUkFUT1IiXSwidXNlcklkIjoxLCJpYXQiOjE3NDI3ODIzMjQsImV4cCI6MTc0Mjg2ODcyNH0.f3UByvw3r1oH9njde2mQOvZCWI0Xhd8KYp4ov7Hjrqg",
+			"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJGb3J1bU1hc3RlcjQyIiwicm9sZXMiOlsiUk9MRV9NT0RFUkFUT1IiXSwidXNlcklkIjoxLCJpYXQiOjE3NDQ1MDk2NjMsImV4cCI6MTc0NDU5NjA2M30.x7zpDch4z5UMof55y9eemUIqeHaieoOOLWxTycakYj4",
 			"type": "string"
 		}
 	]

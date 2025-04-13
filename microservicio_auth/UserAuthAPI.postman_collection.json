@@ -25,10 +25,13 @@
 							"raw": "{\n    \"username\": \"ForumMaster42\",\n    \"password\": \"password\"\n}"
 						},
 						"url": {
-							"raw": "http://localhost:8081/api/auth/signin",
+							"raw": "http://74.249.95.1:8081/api/auth/signin",
 							"protocol": "http",
 							"host": [
-								"localhost"
+								"74",
+								"249",
+								"95",
+								"1"
 							],
 							"port": "8081",
 							"path": [
@@ -56,10 +59,13 @@
 							"raw": "{\n    \"username\": \"TechGuru2000\",\n    \"password\": \"password\"\n}"
 						},
 						"url": {
-							"raw": "http://localhost:8081/api/auth/signin",
+							"raw": "http://74.249.95.1:8081/api/auth/signin",
 							"protocol": "http",
 							"host": [
-								"localhost"
+								"74",
+								"249",
+								"95",
+								"1"
 							],
 							"port": "8081",
 							"path": [
@@ -85,14 +91,18 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer {{moderator_token}}"
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
 							}
 						],
 						"url": {
-							"raw": "http://localhost:8081/api/users",
+							"raw": "http://74.249.95.1:8081/api/users",
 							"protocol": "http",
 							"host": [
-								"localhost"
+								"74",
+								"249",
+								"95",
+								"1"
 							],
 							"port": "8081",
 							"path": [
@@ -111,20 +121,23 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer {{moderator_token}}"
+								"value": "Bearer {{jwt_token}}"
 							}
 						],
 						"url": {
-							"raw": "http://localhost:8081/api/users/2",
+							"raw": "http://74.249.95.1:8081/api/users/3",
 							"protocol": "http",
 							"host": [
-								"localhost"
+								"74",
+								"249",
+								"95",
+								"1"
 							],
 							"port": "8081",
 							"path": [
 								"api",
 								"users",
-								"2"
+								"3"
 							]
 						},
 						"description": "Moderator accessing another user's profile"
@@ -142,18 +155,21 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJGb3J1bU1hc3RlcjQyIiwicm9sZXMiOlsiUk9MRV9NT0RFUkFUT1IiXSwidXNlcklkIjoxLCJpYXQiOjE3NDI3ODc0MjYsImV4cCI6MTc0Mjg3MzgyNn0.LT2VjaLs_L3RXl6Wj4Ts11puVk11UUbj9n5j2lsDQQU"
+								"value": "Bearer {{jwt_token}}"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"username\": \"GameLover123Updated\",\n    \"email\": \"gamelover.updated@example.com\",\n    \"role\": \"MODERATOR\",\n    \"password\": \"abc123\"\n}"
+							"raw": "{\n    \"username\": \"GameLover123Updated3\",\n    \"email\": \"gamelover.updated@example.com\",\n    \"role\": \"MODERATOR\",\n    \"password\": \"abc123\"\n}"
 						},
 						"url": {
-							"raw": "http://localhost:8081/api/users/3",
+							"raw": "http://74.249.95.1:8081/api/users/3",
 							"protocol": "http",
 							"host": [
-								"localhost"
+								"74",
+								"249",
+								"95",
+								"1"
 							],
 							"port": "8081",
 							"path": [
@@ -173,20 +189,23 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer {{moderator_token}}"
+								"value": "Bearer {{jwt_token}}"
 							}
 						],
 						"url": {
-							"raw": "http://localhost:8081/api/users/9",
+							"raw": "http://74.249.95.1:8081/api/users/12",
 							"protocol": "http",
 							"host": [
-								"localhost"
+								"74",
+								"249",
+								"95",
+								"1"
 							],
 							"port": "8081",
 							"path": [
 								"api",
 								"users",
-								"9"
+								"12"
 							]
 						},
 						"description": "Delete a user (requires moderator role)"
@@ -234,11 +253,18 @@
 	"variable": [
 		{
 			"key": "normal_user_token",
-			"value": ""
+			"value": "",
+			"disabled": true
 		},
 		{
 			"key": "moderator_token",
-			"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJGb3J1bU1hc3RlcjQyIiwiaWF0IjoxNzQyNzc2MDAxLCJleHAiOjE3NDI4NjI0MDF9.d4coRK-zPmC8Y9ByUb2KRPzxLLDV1rqLKy7LkTHbwqo"
+			"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJGb3J1bU1hc3RlcjQyIiwiaWF0IjoxNzQyNzc2MDAxLCJleHAiOjE3NDI4NjI0MDF9.d4coRK-zPmC8Y9ByUb2KRPzxLLDV1rqLKy7LkTHbwqo",
+			"disabled": true
+		},
+		{
+			"key": "jwt_token",
+			"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJGb3J1bU1hc3RlcjQyIiwicm9sZXMiOlsiUk9MRV9NT0RFUkFUT1IiXSwidXNlcklkIjoxLCJpYXQiOjE3NDQ1ODc0NzAsImV4cCI6MTc0NDY3Mzg3MH0.QvJXKWON3su78uiUAyS64_Vsdd2Sp0yUzT77JnRnZvA",
+			"type": "string"
 		}
 	]
 }
