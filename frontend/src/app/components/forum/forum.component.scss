@@ -162,6 +162,18 @@
     font-weight: 600;
     color: #495057;
     border-bottom: 2px solid #dee2e6;
+
+    &.status-col, &.last-activity-col {
+      @media (max-width: 768px) {
+        display: none;
+      }
+    }
+
+    &.author-col {
+      @media (max-width: 480px) {
+        display: none;
+      }
+    }
   }
 
   td {
@@ -202,6 +214,10 @@
       &:nth-child(3) { color: #ff9800; } // Sticky thread
     }
   }
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 }
 
 .title-col {
@@ -232,6 +248,10 @@
 .last-activity-col {
   width: 120px;
   color: #666;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 }
 
 .pagination {
@@ -286,5 +306,36 @@
 
   .status-col, .author-col, .replies-col, .views-col, .last-activity-col {
     width: auto;
+  }
+
+  /* Adjust column widths when status and last-activity columns are hidden */
+  .title-col {
+    min-width: 50%;
+    width: 50%;
+  }
+
+  .author-col {
+    width: 20%;
+  }
+
+  .replies-col, .views-col {
+    width: 15%;
+  }
+}
+
+/* Extra small screens - hide author column as well */
+@media (max-width: 680px) {
+  .author-col {
+    display: none;
+  }
+
+  /* Adjust column widths when author column is also hidden */
+  .title-col {
+    min-width: 60%;
+    width: 60%;
+  }
+
+  .replies-col, .views-col {
+    width: 20%;
   }
 }

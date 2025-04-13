@@ -106,3 +106,16 @@
     font-size: 0.95rem;
   }
 }
+
+.avatar-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #667eea;
+  color: white;
+  font-size: 20px;
+}

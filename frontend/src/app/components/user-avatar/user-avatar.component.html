@@ -1,11 +1,15 @@
 <div class="user-avatar-container">
   <div class="avatar" (click)="toggleDropdown()">
-    <img [src]="currentUser?.avatar || 'assets/default-avatar.png'" alt="User avatar">
+     <div class="avatar-icon">
+      <i class="material-icons">person</i>
+     </div>
   </div>
 
   <div class="dropdown-menu" *ngIf="isDropdownOpen">
     <div class="user-info">
-      <img [src]="currentUser?.avatar || 'assets/default-avatar.png'" alt="User avatar">
+      <div class="avatar-icon">
+        <i class="material-icons">person</i>
+      </div>
       <div class="user-details">
         <span class="user-name">{{ currentUser?.name || 'User' }}</span>
         <span class="user-email">{{ currentUser?.email || 'user@example.com' }}</span>
@@ -16,12 +20,12 @@
 
     <div class="dropdown-item" (click)="goToProfile()">
       <i class="material-icons">person</i>
-      <span>Profile</span>
+      <span>Perfil</span>
     </div>
 
     <div class="dropdown-item" (click)="logout()">
       <i class="material-icons">logout</i>
-      <span>Logout</span>
+      <span>Cerrar Sesión</span>
     </div>
   </div>
 </div>

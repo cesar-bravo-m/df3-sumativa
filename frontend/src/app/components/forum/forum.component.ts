@@ -38,9 +38,9 @@ export class ForumComponent {
   categories: Category[] = [
     {
       id: 1,
-      name: 'Discusión General',
+      name: 'Tecnología',
       description: 'Discusiones abiertas sobre cualquier tema',
-      icon: 'chat',
+      icon: 'computer',
       isExpanded: true,
       threads: [
         {
@@ -85,9 +85,9 @@ export class ForumComponent {
     },
     {
       id: 2,
-      name: 'Soporte Técnico',
+      name: 'Programación',
       description: 'Obtén ayuda con problemas técnicos',
-      icon: 'support',
+      icon: 'code',
       isExpanded: false,
       threads: [
         {
@@ -140,9 +140,9 @@ export class ForumComponent {
     },
     {
       id: 3,
-      name: 'Solicitudes de Funciones',
+      name: 'Diseño',
       description: 'Sugiere y discute nuevas funciones',
-      icon: 'lightbulb',
+      icon: 'design_services',
       isExpanded: false,
       threads: [
         {
@@ -203,9 +203,9 @@ export class ForumComponent {
     },
     {
       id: 4,
-      name: 'Anuncios',
+      name: 'Ciencia',
       description: 'Actualizaciones y noticias importantes',
-      icon: 'megaphone',
+      icon: 'science',
       isExpanded: false,
       threads: [
         {
@@ -250,9 +250,9 @@ export class ForumComponent {
     },
     {
       id: 5,
-      name: 'Muestra',
+      name: 'Películas',
       description: 'Comparte tu trabajo y logros',
-      icon: 'trophy',
+      icon: 'theaters',
       isExpanded: false,
       threads: [
         {

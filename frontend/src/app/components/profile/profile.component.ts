@@ -50,9 +50,8 @@ export class ProfileComponent implements OnInit {
     if (this.profileForm.valid) {
       const { currentPassword, newPassword } = this.profileForm.value;
 
-      // Verify current password
-      if (this.authService.login(this.currentUser.username, currentPassword)) {
-        if (this.authService.updatePassword(this.currentUser.username, newPassword)) {
+      if (this.authService.login(this.currentUser.email, currentPassword)) {
+        if (this.authService.updatePassword(this.currentUser.email, newPassword)) {
           this.successMessage = 'Contraseña actualizada exitosamente';
           this.errorMessage = '';
           this.profileForm.reset();

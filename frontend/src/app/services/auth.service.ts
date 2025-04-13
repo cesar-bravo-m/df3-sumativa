@@ -7,6 +7,14 @@ export interface User {
   email?: string;
 }
 
+const storedUsers = [
+  {
+    username: 'admin',
+    password: 'admin',
+    email: 'admin@example.com'
+  },
+]
+
 @Injectable({
   providedIn: 'root'
 })
@@ -16,13 +24,9 @@ export class AuthService {
   public currentUser$ = this.currentUserSubject.asObservable();
 
   constructor() {
-    // Load users from localStorage
-    const storedUsers = localStorage.getItem('users');
+    // const storedUsers = localStorage.getItem('users');
     if (storedUsers) {
-      this.users = JSON.parse(storedUsers);
-    } else {
-      // Initialize with default admin user if no users exist
-      this.users = [{ username: 'admin@example.com', password: 'admin' }];
+      this.users = storedUsers;
       localStorage.setItem('users', JSON.stringify(this.users));
     }
 
