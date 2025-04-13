@@ -1,8 +1,10 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, OnDestroy, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { UserAvatarComponent } from '../user-avatar/user-avatar.component';
 import { NewThreadModalComponent } from './new-thread-modal/new-thread-modal.component';
+import { ThreadDetailsModalComponent } from './thread-details-modal/thread-details-modal.component';
+import { Subscription } from 'rxjs';
 
 interface Thread {
   id: number;
@@ -24,15 +26,38 @@ interface Category {
   isExpanded?: boolean;
 }
 
+interface ThreadDetails {
+  id: number;
+  title: string;
+  author: string;
+  content: string;
+  lastActivity: string;
+  replies: number;
+  views: number;
+  isSticky?: boolean;
+  createdAt: string;
+  comments: Comment[];
+}
+
+interface Comment {
+  id: number;
+  author: string;
+  content: string;
+  createdAt: string;
+}
+
 @Component({
   selector: 'app-forum',
   templateUrl: './forum.component.html',
   styleUrls: ['./forum.component.scss'],
   standalone: true,
-  imports: [CommonModule, RouterLink, UserAvatarComponent, NewThreadModalComponent]
+  imports: [CommonModule, RouterLink, UserAvatarComponent, NewThreadModalComponent, ThreadDetailsModalComponent]
 })
-export class ForumComponent {
+export class ForumComponent implements OnDestroy, AfterViewInit {
   @ViewChild(NewThreadModalComponent) modal!: NewThreadModalComponent;
+  @ViewChild(ThreadDetailsModalComponent) threadModal!: ThreadDetailsModalComponent;
+
+  private commentSubscription?: Subscription;
 
   currentPage: number = 1;
   totalPages: number = 5;
@@ -361,6 +386,64 @@ export class ForumComponent {
           category.threads.unshift(newThread);
         }
       });
+    }
+  }
+
+  generatePlaceholderComments(thread: Thread): Comment[] {
+    const comments: Comment[] = [];
+    const authors = ['Usuario123', 'Moderador', 'Admin', 'MiembroActivo', 'NuevoUsuario'];
+    const commentTemplates = [
+      'Me parece muy interesante este tema. {content}',
+      'Gracias por compartir esta información. {content}',
+      'Tengo una pregunta sobre {content}',
+      'Estoy de acuerdo con lo que mencionas sobre {content}',
+      'Podrías explicar más sobre {content}?'
+    ];
+
+    const numComments = Math.floor(Math.random() * 5) + 3; // 3-7 comments
+
+    for (let i = 0; i < numComments; i++) {
+      const template = commentTemplates[Math.floor(Math.random() * commentTemplates.length)];
+      const content = template.replace('{content}', thread.title.toLowerCase());
+
+      comments.push({
+        id: i + 1,
+        author: authors[Math.floor(Math.random() * authors.length)],
+        content: content,
+        createdAt: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString() // Random date within last week
+      });
+    }
+
+    return comments;
+  }
+
+  openThreadDetails(thread: Thread): void {
+    const threadDetails: ThreadDetails = {
+      ...thread,
+      content: `Este es el contenido del tema "${thread.title}". Aquí se muestra el mensaje original del autor.`,
+      comments: this.generatePlaceholderComments(thread)
+    };
+
+    this.threadModal.thread = threadDetails;
+    this.threadModal.open();
+  }
+
+  ngAfterViewInit() {
+    // Set up the comment subscription once when the component is initialized
+    if (this.threadModal) {
+      this.commentSubscription = this.threadModal.addNewComment.subscribe((comment: Comment) => {
+        if (this.threadModal.thread) {
+          this.threadModal.thread.comments.push(comment);
+          this.threadModal.thread.replies++;
+          this.threadModal.thread.lastActivity = new Date().toISOString();
+        }
+      });
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.commentSubscription) {
+      this.commentSubscription.unsubscribe();
     }
   }
 }

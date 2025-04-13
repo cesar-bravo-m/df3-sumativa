@@ -1,5 +1,6 @@
 <div class="forum-container">
   <app-new-thread-modal></app-new-thread-modal>
+  <app-thread-details-modal></app-thread-details-modal>
   <div class="forum-header">
     <div class="header-content">
       <h1>Foro DUOC</h1>
@@ -46,7 +47,10 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let thread of category.threads" [ngClass]="{'new-thread': isNewThread(thread), 'hot-thread': isHotThread(thread)}">
+            <tr *ngFor="let thread of category.threads"
+                [ngClass]="{'new-thread': isNewThread(thread), 'hot-thread': isHotThread(thread)}"
+                (click)="openThreadDetails(thread)"
+                style="cursor: pointer;">
               <td class="status-col">
                 <div class="thread-status">
                   <i class="material-icons" *ngIf="isNewThread(thread)" title="Tema Nuevo">fiber_new</i>
