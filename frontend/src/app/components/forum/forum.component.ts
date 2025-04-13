@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { UserAvatarComponent } from '../user-avatar/user-avatar.component';
+import { NewThreadModalComponent } from './new-thread-modal/new-thread-modal.component';
 
 interface Thread {
   id: number;
@@ -28,9 +29,11 @@ interface Category {
   templateUrl: './forum.component.html',
   styleUrls: ['./forum.component.scss'],
   standalone: true,
-  imports: [CommonModule, RouterLink, UserAvatarComponent]
+  imports: [CommonModule, RouterLink, UserAvatarComponent, NewThreadModalComponent]
 })
 export class ForumComponent {
+  @ViewChild(NewThreadModalComponent) modal!: NewThreadModalComponent;
+
   currentPage: number = 1;
   totalPages: number = 5;
   threadsPerPage: number = 10;
@@ -341,9 +344,23 @@ export class ForumComponent {
   }
 
   createNewThread(categoryId: number): void {
-    // This would typically navigate to a new thread creation page
-    console.log(`Creando nuevo tema en categoría ${categoryId}`);
-    // Prevent the category from collapsing when clicking the button
-    event?.stopPropagation();
+    if (this.modal) {
+      this.modal.open();
+      this.modal.createThread.subscribe((threadData: {title: string, content: string}) => {
+        const category = this.categories.find(c => c.id === categoryId);
+        if (category) {
+          const newThread: Thread = {
+            id: Math.max(...category.threads.map(t => t.id)) + 1,
+            title: threadData.title,
+            author: 'Usuario Actual', // This should come from your auth service
+            lastActivity: new Date().toISOString(),
+            replies: 0,
+            views: 0,
+            createdAt: new Date().toISOString()
+          };
+          category.threads.unshift(newThread);
+        }
+      });
+    }
   }
 }

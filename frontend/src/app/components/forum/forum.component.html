@@ -1,4 +1,5 @@
 <div class="forum-container">
+  <app-new-thread-modal></app-new-thread-modal>
   <div class="forum-header">
     <div class="header-content">
       <h1>Foro DUOC</h1>
@@ -59,7 +60,7 @@
               <td class="author-col">{{thread.author}}</td>
               <td class="replies-col">{{thread.replies}}</td>
               <td class="views-col">{{thread.views}}</td>
-              <td class="last-activity-col">{{thread.lastActivity}}</td>
+              <td class="last-activity-col">{{thread.lastActivity ? thread.lastActivity.slice(0, 10) : 'N/A'}}</td>
             </tr>
           </tbody>
         </table>
