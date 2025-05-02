@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { BehaviorSubject } from 'rxjs';
+import { Validators } from '@angular/forms';
 
 describe('ProfileComponent', () => {
   let component: ProfileComponent;
@@ -64,6 +65,18 @@ describe('ProfileComponent', () => {
       currentUserSubject.next(null);
       expect(navigateSpy).toHaveBeenCalledWith(['/login']);
     });
+
+    it('should handle confirm password validation when new password changes', () => {
+      const confirmPasswordControl = component.profileForm.get('confirmPassword');
+
+      // When new password is empty, confirm password should not be required
+      component.profileForm.get('newPassword')?.setValue('');
+      expect(confirmPasswordControl?.hasValidator(Validators.required)).toBeFalse();
+
+      // When new password has value, confirm password should be required
+      component.profileForm.get('newPassword')?.setValue('newpass123');
+      expect(confirmPasswordControl?.hasValidator(Validators.required)).toBeTrue();
+    });
   });
 
   describe('Form Validation', () => {
@@ -109,6 +122,14 @@ describe('ProfileComponent', () => {
       });
       expect(component.profileForm.errors?.['mismatch']).toBeTruthy();
     });
+
+    it('should not show password mismatch error when new password is empty', () => {
+      component.profileForm.patchValue({
+        newPassword: '',
+        confirmPassword: 'anyvalue'
+      });
+      expect(component.profileForm.errors).toBeNull();
+    });
   });
 
   describe('Password Validation', () => {
@@ -145,6 +166,43 @@ describe('ProfileComponent', () => {
       expect(component.hasSpecialChar()).toBeFalse();
       component.profileForm.get('newPassword')?.setValue('abc123!@#');
       expect(component.hasSpecialChar()).toBeTrue();
+    });
+  });
+
+  describe('Error Messages', () => {
+    it('should return correct username error messages', () => {
+      const usernameControl = component.profileForm.get('username');
+
+      usernameControl?.setValue('');
+      expect(component.getUsernameErrors()).toContain('El nombre de usuario es requerido');
+
+      usernameControl?.setValue('ab');
+      expect(component.getUsernameErrors()).toContain('El nombre de usuario debe tener al menos 3 caracteres');
+
+      usernameControl?.setValue('abcdefghijklm');
+      expect(component.getUsernameErrors()).toContain('El nombre de usuario no debe exceder 12 caracteres');
+
+      usernameControl?.setValue('test@user');
+      expect(component.getUsernameErrors()).toContain('El nombre de usuario no puede contener caracteres especiales');
+    });
+
+    it('should return correct password error messages', () => {
+      const passwordControl = component.profileForm.get('newPassword');
+
+      passwordControl?.setErrors({ minLength: true });
+      expect(component.getPasswordErrors()).toContain('La contraseña debe tener al menos 8 caracteres');
+
+      passwordControl?.setErrors({ maxLength: true });
+      expect(component.getPasswordErrors()).toContain('La contraseña no debe exceder 32 caracteres');
+
+      passwordControl?.setErrors({ requireLetter: true });
+      expect(component.getPasswordErrors()).toContain('La contraseña debe contener al menos una letra');
+
+      passwordControl?.setErrors({ requireNumber: true });
+      expect(component.getPasswordErrors()).toContain('La contraseña debe contener al menos un número');
+
+      passwordControl?.setErrors({ requireSpecialChar: true });
+      expect(component.getPasswordErrors()).toContain('La contraseña debe contener al menos un carácter especial');
     });
   });
 
@@ -227,6 +285,37 @@ describe('ProfileComponent', () => {
 
       expect(component.errorMessage).toBe('Error al actualizar la contraseña');
       expect(component.successMessage).toBe('');
+    });
+
+    it('should not submit if form is invalid', () => {
+      component.profileForm.patchValue({
+        username: '',
+        currentPassword: ''
+      });
+
+      component.onSubmit();
+
+      expect(authService.login).not.toHaveBeenCalled();
+      expect(authService.updateUsername).not.toHaveBeenCalled();
+      expect(authService.updatePassword).not.toHaveBeenCalled();
+    });
+
+    it('should clear form fields after successful password update', () => {
+      authService.login.and.returnValue(true);
+      authService.updatePassword.and.returnValue(true);
+
+      component.profileForm.patchValue({
+        username: mockUser.username,
+        currentPassword: 'currentpass',
+        newPassword: 'newpass123!',
+        confirmPassword: 'newpass123!'
+      });
+
+      component.onSubmit();
+
+      expect(component.profileForm.get('currentPassword')?.value).toBe('');
+      expect(component.profileForm.get('newPassword')?.value).toBe('');
+      expect(component.profileForm.get('confirmPassword')?.value).toBe('');
     });
   });
 

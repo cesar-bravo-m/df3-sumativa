@@ -94,7 +94,8 @@
               "src/**/*.spec.ts",
               "src/**/*.module.ts",
               "src/environments/**"
-            ]
+            ],
+            "karmaConfig": "karma.conf.js"
           }
         }
       }
