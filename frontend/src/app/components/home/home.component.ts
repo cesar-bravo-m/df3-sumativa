@@ -13,7 +13,6 @@ export class HomeComponent {
   constructor(private router: Router) {}
 
   ngOnInit() {
-    // Redirect to forum page
     this.router.navigate(['/forum']);
   }
 }

@@ -59,7 +59,7 @@ export class AuthService {
   recoverPassword(email: string): string {
     const user = this.users.find(u => u.email === email);
     if (user) {
-      return '000'; // Dummy verification code
+      return '000';
     }
     return '';
   }

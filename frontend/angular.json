@@ -87,7 +87,14 @@
             "styles": [
               "src/styles.css"
             ],
-            "scripts": []
+            "scripts": [],
+            "codeCoverage": true,
+            "codeCoverageExclude": [
+              "src/test.ts",
+              "src/**/*.spec.ts",
+              "src/**/*.module.ts",
+              "src/environments/**"
+            ]
           }
         }
       }
