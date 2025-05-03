@@ -1,102 +1,145 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, map, Observable, tap, switchMap } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface User {
+  id: number;
   username: string;
-  password: string;
-  email?: string;
+  email: string;
+  role: 'MODERATOR' | 'NORMAL_POSTER';
+  roles?: string[];
+  moderator?: boolean;
 }
 
-const storedUsers = [
-  {
-    username: 'admin',
-    password: 'admin',
-    email: 'admin@example.com'
-  },
-]
+export interface LoginRequest {
+  username: string;
+  password: string;
+}
+
+export interface SignupRequest {
+  username: string;
+  email: string;
+  password: string;
+  role: 'MODERATOR' | 'NORMAL_POSTER';
+}
+
+export interface JwtResponse {
+  token: string;
+  type: string;
+  id: number;
+  username: string;
+  email: string;
+  role: 'MODERATOR' | 'NORMAL_POSTER';
+  roles: string[];
+  moderator?: boolean;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private users: User[] = [];
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
+  private readonly API_URL = environment.authApiUrl;
 
-  constructor() {
-    // const storedUsers = localStorage.getItem('users');
-    if (storedUsers) {
-      this.users = storedUsers;
-      localStorage.setItem('users', JSON.stringify(this.users));
-    }
-
+  constructor(private http: HttpClient) {
     const storedUser = localStorage.getItem('currentUser');
     if (storedUser) {
       this.currentUserSubject.next(JSON.parse(storedUser));
     }
   }
 
-  login(email: string, password: string): boolean {
-    const user = this.users.find(u => u.email === email && u.password === password);
-    if (user) {
-      this.currentUserSubject.next(user);
-      localStorage.setItem('currentUser', JSON.stringify(user));
-      return true;
-    }
-    return false;
+  login(email: string, password: string): Observable<JwtResponse> {
+    console.log("### SERVICE login with email", email, "and password", password);
+    return this.http.post<JwtResponse>(`${this.API_URL}/api/auth/signin`, { email, password })
+      .pipe(
+        tap(response => {
+          const user: User = {
+            id: response.id,
+            username: response.username,
+            email: response.email,
+            role: response.role,
+            moderator: response.moderator ? response.moderator : false,
+            roles: response.roles
+          };
+          console.log("### response", response);
+          this.currentUserSubject.next(user);
+          // localStorage.setItem('currentUser', JSON.stringify(user));
+          // localStorage.setItem('token', response.token);
+        })
+      );
   }
 
   register(username: string, password: string, email: string): boolean {
-    if (this.users.some(u => u.email === email)) {
+    const signupRequest: SignupRequest = {
+      username: username,
+      email: email,
+      password: password,
+      role: 'NORMAL_POSTER'
+    };
+    this.http.post(`${this.API_URL}/api/auth/signup`, signupRequest).subscribe((response: any) => {
+      console.log("### response", response);
+      if (response && response.message === "User registered successfully!") {
+        return true;
+      }
       return false;
-    }
-    const newUser: User = { username, password, email };
-    this.users.push(newUser);
-    localStorage.setItem('users', JSON.stringify(this.users));
+    });
     return true;
   }
 
-  recoverPassword(email: string): string {
-    const user = this.users.find(u => u.email === email);
-    if (user) {
-      return '000';
-    }
-    return '';
+  getUserIdFromEmail(email: string): Observable<number> {
+    console.log("### getUserIdFrom Email ", email);
+    return this.http.get(`${this.API_URL}/api/users/email/${email}`).pipe(
+      map((response: any) => response.id)
+    );
   }
 
-  updatePassword(email: string, newPassword: string): boolean {
-    const userIndex = this.users.findIndex(u => u.email === email);
-    if (userIndex !== -1) {
-      this.users[userIndex].password = newPassword;
-      if (this.currentUserSubject.value?.email === email) {
-        this.currentUserSubject.next({ ...this.users[userIndex] });
-        localStorage.setItem('currentUser', JSON.stringify(this.users[userIndex]));
-      }
-      return true;
-    }
-    return false;
+  updatePassword(email: string, password: string): Observable<boolean> {
+    return this.getUserIdFromEmail(email).pipe(
+      switchMap((userId: number) => this.http.put<boolean>(`${this.API_URL}/api/auth/update/${userId}`, { password }))
+    );
   }
 
-  updateUsername(email: string, newUsername: string): boolean {
-    const userIndex = this.users.findIndex(u => u.email === email);
-    if (userIndex !== -1) {
-      this.users[userIndex].username = newUsername;
-      if (this.currentUserSubject.value?.email === email) {
-        this.currentUserSubject.next({ ...this.users[userIndex] });
-        localStorage.setItem('currentUser', JSON.stringify(this.users[userIndex]));
-      }
-      localStorage.setItem('users', JSON.stringify(this.users));
-      return true;
-    }
-    return false;
+  recoverPassword(username: string): string {
+    // this.http.post(`${this.API_URL}/api/auth/recover/${username}`, {}).subscribe((response: any) => {
+    //   console.log("### response", response);
+    //   if (response && response.message === "Password recovered successfully!") {
+    //     return true;
+    //   }
+    // });
+    // return false;
+    return '000'
   }
 
   logout(): void {
     this.currentUserSubject.next(null);
     localStorage.removeItem('currentUser');
+    localStorage.removeItem('token');
   }
 
   isLoggedIn(): boolean {
     return this.currentUserSubject.value !== null;
+  }
+
+  getToken(): string | null {
+    return localStorage.getItem('token');
+  }
+
+  getUser(): User | null {
+    return this.currentUserSubject.value;
+  }
+
+  isModerator(): boolean {
+    return this.currentUserSubject.value?.role === 'MODERATOR';
+  }
+
+  // The endpoint for all "updateXXX" methods is /api/users/{id}
+  updateUsername(id: number, newUsername: string): Observable<any> {
+    return this.http.put(`${this.API_URL}/api/users/${id}`, { username: newUsername });
+  }
+
+  updateEmail(id: number, newEmail: string): Observable<any> {
+    return this.http.put(`${this.API_URL}/api/users/${id}`, { email: newEmail });
   }
 }

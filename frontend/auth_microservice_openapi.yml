@@ -1,0 +1,295 @@
+openapi: 3.0.0
+info:
+  title: Authentication Microservice API
+  description: API for user authentication and management
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@example.com
+
+servers:
+  - url: http://localhost:8081
+    description: Local development server
+  - url: http://74.249.95.1:8081
+    description: Production server
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token for authentication
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: User ID
+        username:
+          type: string
+          minLength: 3
+          maxLength: 20
+          description: Username
+        email:
+          type: string
+          format: email
+          maxLength: 50
+          description: User email
+        role:
+          type: string
+          enum: [MODERATOR, NORMAL_POSTER]
+          description: User role
+      required:
+        - username
+        - email
+
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          description: Username
+        password:
+          type: string
+          description: Password
+      required:
+        - username
+        - password
+
+    SignupRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 20
+          description: Username
+        email:
+          type: string
+          format: email
+          maxLength: 50
+          description: User email
+        password:
+          type: string
+          minLength: 6
+          maxLength: 40
+          description: Password
+        role:
+          type: string
+          enum: [MODERATOR, NORMAL_POSTER]
+          description: User role
+      required:
+        - username
+        - email
+        - password
+
+    JwtResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          description: JWT access token
+        type:
+          type: string
+          description: Token type (Bearer)
+        id:
+          type: integer
+          format: int64
+          description: User ID
+        username:
+          type: string
+          description: Username
+        email:
+          type: string
+          description: User email
+        role:
+          type: string
+          enum: [MODERATOR, NORMAL_POSTER]
+          description: User role
+        roles:
+          type: array
+          items:
+            type: string
+          description: List of user roles
+
+    MessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Response message
+
+paths:
+  /api/auth/signin:
+    post:
+      summary: Authenticate user
+      description: Authenticate user and return JWT token
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Successful authentication
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JwtResponse'
+        '401':
+          description: Unauthorized - Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+
+  /api/auth/signup:
+    post:
+      summary: Register new user
+      description: Register a new user account
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignupRequest'
+      responses:
+        '200':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '400':
+          description: Bad request - Username or email already taken
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+
+  /api/users:
+    get:
+      summary: Get all users
+      description: Retrieve all users (requires MODERATOR role)
+      tags:
+        - User Management
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized - Missing or invalid token
+        '403':
+          description: Forbidden - Insufficient permissions
+
+  /api/users/{id}:
+    get:
+      summary: Get user by ID
+      description: Retrieve user by ID (requires MODERATOR role or own profile)
+      tags:
+        - User Management
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: User ID
+      responses:
+        '200':
+          description: User details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized - Missing or invalid token
+        '403':
+          description: Forbidden - Insufficient permissions
+        '404':
+          description: User not found
+
+    put:
+      summary: Update user
+      description: Update user details (requires MODERATOR role or own profile)
+      tags:
+        - User Management
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: User ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Bad request - Invalid data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '401':
+          description: Unauthorized - Missing or invalid token
+        '403':
+          description: Forbidden - Insufficient permissions
+        '404':
+          description: User not found
+
+    delete:
+      summary: Delete user
+      description: Delete user (requires MODERATOR role)
+      tags:
+        - User Management
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: User ID
+      responses:
+        '204':
+          description: User deleted successfully
+        '401':
+          description: Unauthorized - Missing or invalid token
+        '403':
+          description: Forbidden - Insufficient permissions
+        '404':
+          description: User not found

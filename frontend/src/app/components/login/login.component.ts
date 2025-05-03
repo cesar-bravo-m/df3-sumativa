@@ -121,12 +121,17 @@ export class LoginComponent {
       const email = this.loginForm.get('email')?.value;
       const password = this.loginForm.get('password')?.value;
 
-      if (this.authService.login(email, password)) {
-        this.router.navigate(['/forum']);
-      } else {
-        this.errorMessage = 'Correo electrónico o contraseña inválidos';
-        this.isLoading = false;
-      }
+      this.authService.login(email, password).subscribe({
+        next: (response) => {
+          console.log("### login success", response);
+          this.router.navigate(['/forum']);
+        },
+        error: (error) => {
+          console.log("### login FAILURE", error);
+          this.errorMessage = 'Correo electrónico o contraseña inválidos';
+          this.isLoading = false;
+        }
+      });
     } else {
       this.errorMessage = 'Por favor completa todos los campos correctamente';
     }

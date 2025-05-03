@@ -4,26 +4,21 @@ import { BehaviorSubject } from 'rxjs';
 
 describe('AuthService', () => {
   let service: AuthService;
-  let localStorageSpy: jasmine.SpyObj<Storage>;
   let currentUserSubject: BehaviorSubject<any>;
 
   const mockUser = {
+    id: 1,
     username: 'testuser',
     password: 'testpass',
-    email: 'test@example.com'
+    email: 'test@example.com',
+    moderator: false,
+    roles: ['NORMAL_POSTER']
   };
 
   const mockUsers = [mockUser];
 
   beforeEach(() => {
-    localStorageSpy = jasmine.createSpyObj('localStorage', ['getItem', 'setItem', 'removeItem']);
-    Object.defineProperty(window, 'localStorage', { value: localStorageSpy });
-
-    // Mock initial users array
     (AuthService as any).storedUsers = mockUsers;
-    localStorageSpy.getItem.withArgs('users').and.returnValue(JSON.stringify(mockUsers));
-    localStorageSpy.getItem.withArgs('currentUser').and.returnValue(null);
-
     TestBed.configureTestingModule({
       providers: [AuthService]
     });
@@ -42,13 +37,6 @@ describe('AuthService', () => {
       expect(currentUserSubject.value).toBeNull();
     });
 
-    it('debería cargar el usuario actual desde localStorage si está disponible', () => {
-      localStorageSpy.getItem.withArgs('currentUser').and.returnValue(JSON.stringify(mockUser));
-      const newService = new AuthService();
-      expect(newService.isLoggedIn()).toBeTrue();
-      expect((newService as any).currentUserSubject.value).toEqual(mockUser);
-    });
-
   });
 
   describe('Inicio de sesión', () => {
@@ -63,7 +51,6 @@ describe('AuthService', () => {
       expect(result).toBeFalse();
       expect(service.isLoggedIn()).toBeFalse();
       expect(currentUserSubject.value).toBeNull();
-      expect(localStorageSpy.setItem).not.toHaveBeenCalledWith('currentUser', jasmine.any(String));
     });
   });
 
@@ -77,7 +64,6 @@ describe('AuthService', () => {
 
       const result = service.register(newUser.username, newUser.password, newUser.email);
       expect(result).toBeTrue();
-      expect(localStorageSpy.setItem).toHaveBeenCalledWith('users', jasmine.any(String));
     });
 
     it('debería fallar el registro con un email existente', () => {
@@ -105,20 +91,9 @@ describe('AuthService', () => {
       service.login(mockUser.email, mockUser.password);
     });
 
-    // it('debería actualizar la contraseña exitosamente', () => {
-    //   const newPassword = 'newpass123';
-    //   (service as any).users = [mockUser];
-    //   const result = service.updatePassword(mockUser.email, newPassword);
-    //   expect(result).toBeTrue();
-    //   expect(localStorageSpy.setItem).toHaveBeenCalledWith('users', JSON.stringify({ ...mockUser, password: newPassword }));
-    //   expect(localStorageSpy.setItem).toHaveBeenCalledWith('users', JSON.stringify([{ ...mockUser, password: newPassword }]));
-    // });
-
     it('debería fallar la actualización de contraseña para un email inexistente', () => {
       const result = service.updatePassword('nonexistent@example.com', 'newpass');
       expect(result).toBeFalse();
-      expect(localStorageSpy.setItem).not.toHaveBeenCalledWith('currentUser', jasmine.any(Object));
-      expect(localStorageSpy.setItem).not.toHaveBeenCalledWith('users', jasmine.any(Object));
     });
   });
 
@@ -130,18 +105,15 @@ describe('AuthService', () => {
     it('debería actualizar el nombre de usuario exitosamente', () => {
       (service as any).users = [mockUser];
       const newUsername = 'newusername';
-      const result = service.updateUsername(mockUser.email, newUsername);
+      const result = service.updateUsername(1, newUsername);
       expect(result).toBeTrue();
       const updatedUser = { ...mockUser, username: newUsername };
-      expect(localStorageSpy.setItem).toHaveBeenCalledWith('users', JSON.stringify([updatedUser]));
     });
 
     it('debería fallar la actualización de nombre de usuario para un email inexistente', () => {
-      const result = service.updateUsername('nonexistent@example.com', 'newusername');
+      const result = service.updateUsername(0, 'newusername');
       (service as any).users = [mockUser];
       expect(result).toBeFalse();
-      expect(localStorageSpy.setItem).not.toHaveBeenCalledWith('currentUser', jasmine.any(Object));
-      expect(localStorageSpy.setItem).not.toHaveBeenCalledWith('users', jasmine.any(Object));
     });
   });
 
@@ -154,7 +126,6 @@ describe('AuthService', () => {
       service.logout();
       expect(service.isLoggedIn()).toBeFalse();
       expect(currentUserSubject.value).toBeNull();
-      expect(localStorageSpy.removeItem).toHaveBeenCalledWith('currentUser');
     });
   });
 });

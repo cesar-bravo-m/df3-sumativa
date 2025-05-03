@@ -27,7 +27,7 @@ export class ProfileComponent implements OnInit {
       username: ['', [
         Validators.required,
         Validators.minLength(3),
-        Validators.maxLength(12),
+        Validators.maxLength(32),
         Validators.pattern('^[a-zA-Z0-9]+$')
       ]],
       currentPassword: ['', [Validators.required]],
@@ -87,18 +87,20 @@ export class ProfileComponent implements OnInit {
         }
 
         if (newPassword && newPassword.length > 0 && updateSuccess) {
-          if (this.authService.updatePassword(this.currentUser.email, newPassword)) {
-            this.successMessage = 'Perfil actualizado exitosamente';
-            this.errorMessage = '';
-            this.profileForm.patchValue({
-              currentPassword: '',
-              newPassword: '',
-              confirmPassword: ''
-            });
-          } else {
-            this.errorMessage = 'Error al actualizar la contraseña';
-            this.successMessage = '';
-          }
+          this.authService.updatePassword(this.currentUser.email, newPassword).subscribe((response: any) => {
+            if (response) {
+              this.successMessage = 'Perfil actualizado exitosamente';
+              this.errorMessage = '';
+              this.profileForm.patchValue({
+                currentPassword: '',
+                newPassword: '',
+                confirmPassword: ''
+              });
+            } else {
+              this.errorMessage = 'Error al actualizar la contraseña';
+              this.successMessage = '';
+            }
+          });
         } else if (updateSuccess) {
           this.successMessage = 'Nombre de usuario actualizado exitosamente';
           this.errorMessage = '';

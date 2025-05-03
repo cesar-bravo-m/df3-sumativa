@@ -1,10 +1,9 @@
 <div class="login-container">
   <div class="login-card">
     <h2>Bienvenido</h2>
-    <p class="subtitle">Por favor inicia sesión para continuar</p>
 
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
-      <div class="form-group">
+      <div class="form-group" style="margin-right: 28px;">
         <label for="email">Correo electrónico</label>
         <input
           type="email"
@@ -21,7 +20,7 @@
         </div>
       </div>
 
-      <div class="form-group">
+      <div class="form-group" style="margin-right: 28px;">
         <label for="password">Contraseña</label>
         <input
           type="password"
