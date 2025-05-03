@@ -10,6 +10,7 @@ export interface User {
   role: 'MODERATOR' | 'NORMAL_POSTER';
   roles?: string[];
   moderator?: boolean;
+  token?: string;
 }
 
 export interface LoginRequest {
@@ -25,7 +26,7 @@ export interface SignupRequest {
 }
 
 export interface JwtResponse {
-  token: string;
+  accessToken: string;
   type: string;
   id: number;
   username: string;
@@ -61,12 +62,12 @@ export class AuthService {
             email: response.email,
             role: response.role,
             moderator: response.moderator ? response.moderator : false,
-            roles: response.roles
+            roles: response.roles,
+            token: response.accessToken
           };
           console.log("### response", response);
           this.currentUserSubject.next(user);
-          // localStorage.setItem('currentUser', JSON.stringify(user));
-          // localStorage.setItem('token', response.token);
+          localStorage.setItem('token', response.accessToken);
         })
       );
   }
