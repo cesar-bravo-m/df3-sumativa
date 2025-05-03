@@ -58,20 +58,20 @@ describe('ThreadDetailsModalComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('debería crear', () => {
     expect(component).toBeTruthy();
   });
 
-  describe('Initialization', () => {
-    it('should initialize with closed state', () => {
+  describe('Inicialización', () => {
+    it('debería inicializarse con el estado cerrado', () => {
       expect(component.isOpen).toBeFalse();
     });
 
-    it('should initialize with empty newComment', () => {
+    it('debería inicializarse con newComment vacío', () => {
       expect(component.newComment).toBe('');
     });
 
-    it('should initialize comments array if not present', () => {
+    it('debería inicializar el array de comentarios si no está presente', () => {
       const threadWithoutComments = { ...mockThread, comments: [] };
       component.thread = threadWithoutComments;
       component.ngOnChanges({
@@ -86,13 +86,13 @@ describe('ThreadDetailsModalComponent', () => {
     });
   });
 
-  describe('Modal State Management', () => {
-    it('should open modal', () => {
+  describe('Gestión del estado del modal', () => {
+    it('debería abrir el modal', () => {
       component.open();
       expect(component.isOpen).toBeTrue();
     });
 
-    it('should close modal and emit closeModal event', () => {
+    it('debería cerrar el modal y emitir el evento closeModal', () => {
       spyOn(component.closeModal, 'emit');
       component.open();
       component.close();
@@ -102,8 +102,8 @@ describe('ThreadDetailsModalComponent', () => {
     });
   });
 
-  describe('Comment Management', () => {
-    it('should add new comment and emit addNewComment event', () => {
+  describe('Gestión de comentarios', () => {
+    it('debería agregar un nuevo comentario y emitir el evento addNewComment', () => {
       spyOn(component.addNewComment, 'emit');
       component.newComment = 'New Test Comment';
       component.addComment();
@@ -116,14 +116,14 @@ describe('ThreadDetailsModalComponent', () => {
       expect(component.newComment).toBe('');
     });
 
-    it('should not add empty comment', () => {
+    it('no debería agregar un comentario vacío', () => {
       spyOn(component.addNewComment, 'emit');
       component.newComment = '   ';
       component.addComment();
       expect(component.addNewComment.emit).not.toHaveBeenCalled();
     });
 
-    it('should not add comment if thread is undefined', () => {
+    it('no debería agregar un comentario si el hilo no está definido', () => {
       spyOn(component.addNewComment, 'emit');
       component.thread = undefined;
       component.newComment = 'New Test Comment';
@@ -132,50 +132,50 @@ describe('ThreadDetailsModalComponent', () => {
     });
   });
 
-  describe('Template Rendering', () => {
-    it('should display thread title', () => {
+  describe('Renderizado de la plantilla', () => {
+    it('debería mostrar el título del hilo', () => {
       component.open();
       fixture.detectChanges();
       const titleElement = fixture.nativeElement.querySelector('h2');
       expect(titleElement.textContent).toContain(mockThread.title);
     });
 
-    it('should display thread author', () => {
+    it('debería mostrar el autor del hilo', () => {
       component.open();
       fixture.detectChanges();
       const authorElement = fixture.nativeElement.querySelector('.thread-meta span');
       expect(authorElement.textContent).toContain(mockThread.author);
     });
 
-    it('should display thread content', () => {
+    it('debería mostrar el contenido del hilo', () => {
       component.open();
       fixture.detectChanges();
       const contentElement = fixture.nativeElement.querySelector('.thread-content');
       expect(contentElement.textContent).toContain(mockThread.content);
     });
 
-    it('should display comments', () => {
+    it('debería mostrar los comentarios', () => {
       component.open();
       fixture.detectChanges();
       const comments = fixture.nativeElement.querySelectorAll('.comment');
       expect(comments.length).toBe(mockThread.comments.length);
     });
 
-    it('should display comment form when modal is open', () => {
+    it('debería mostrar el formulario de comentarios cuando el modal está abierto', () => {
       component.open();
       fixture.detectChanges();
       const form = fixture.nativeElement.querySelector('.add-comment-form');
       expect(form).toBeTruthy();
     });
 
-    it('should not display modal when closed', () => {
+    it('no debería mostrar el modal cuando está cerrado', () => {
       const modal = fixture.nativeElement.querySelector('.modal-overlay');
       expect(modal).toBeNull();
     });
   });
 
-  describe('Event Handling', () => {
-    it('should close modal when clicking overlay', () => {
+  describe('Manejo de eventos', () => {
+    it('debería cerrar el modal al hacer clic en el overlay', () => {
       spyOn(component, 'close');
       component.open();
       fixture.detectChanges();
@@ -184,7 +184,7 @@ describe('ThreadDetailsModalComponent', () => {
       expect(component.close).toHaveBeenCalled();
     });
 
-    it('should not close modal when clicking content', () => {
+    it('no debería cerrar el modal al hacer clic en el contenido', () => {
       spyOn(component, 'close');
       component.open();
       fixture.detectChanges();
@@ -193,7 +193,7 @@ describe('ThreadDetailsModalComponent', () => {
       expect(component.close).not.toHaveBeenCalled();
     });
 
-    it('should close modal when clicking close button', () => {
+    it('debería cerrar el modal al hacer clic en el botón de cerrar', () => {
       spyOn(component, 'close');
       component.open();
       fixture.detectChanges();

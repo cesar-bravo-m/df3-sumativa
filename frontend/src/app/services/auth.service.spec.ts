@@ -32,17 +32,17 @@ describe('AuthService', () => {
     currentUserSubject = (service as any).currentUserSubject;
   });
 
-  it('should be created', () => {
+  it('debería ser creado', () => {
     expect(service).toBeTruthy();
   });
 
-  describe('Initialization', () => {
-    it('should initialize with no current user', () => {
+  describe('Inicialización', () => {
+    it('debería inicializarse sin usuario actual', () => {
       expect(service.isLoggedIn()).toBeFalse();
       expect(currentUserSubject.value).toBeNull();
     });
 
-    it('should load current user from localStorage if available', () => {
+    it('debería cargar el usuario actual desde localStorage si está disponible', () => {
       localStorageSpy.getItem.withArgs('currentUser').and.returnValue(JSON.stringify(mockUser));
       const newService = new AuthService();
       expect(newService.isLoggedIn()).toBeTrue();
@@ -51,14 +51,14 @@ describe('AuthService', () => {
 
   });
 
-  describe('Login', () => {
-    it('should login successfully with correct credentials', () => {
+  describe('Inicio de sesión', () => {
+    it('debería iniciar sesión exitosamente con credenciales correctas', () => {
       (service as any).users = [mockUser];
       const result = service.login(mockUser.email, mockUser.password);
       expect(result).toBeTrue();
     });
 
-    it('should fail login with incorrect credentials', () => {
+    it('debería fallar el inicio de sesión con credenciales incorrectas', () => {
       const result = service.login('wrong@email.com', 'wrongpass');
       expect(result).toBeFalse();
       expect(service.isLoggedIn()).toBeFalse();
@@ -67,8 +67,8 @@ describe('AuthService', () => {
     });
   });
 
-  describe('Registration', () => {
-    it('should register new user successfully', () => {
+  describe('Registro', () => {
+    it('debería registrar un nuevo usuario exitosamente', () => {
       const newUser = {
         username: 'newuser',
         password: 'newpass',
@@ -80,32 +80,32 @@ describe('AuthService', () => {
       expect(localStorageSpy.setItem).toHaveBeenCalledWith('users', jasmine.any(String));
     });
 
-    it('should fail registration with existing email', () => {
+    it('debería fallar el registro con un email existente', () => {
       (service as any).users = [mockUser];
       const result = service.register('newuser', 'newpass', mockUser.email);
       expect(result).toBeFalse();
     });
   });
 
-  describe('Password Recovery', () => {
-    it('should return verification code for existing email', () => {
+  describe('Recuperación de contraseña', () => {
+    it('debería devolver el código de verificación para un email existente', () => {
       (service as any).users = [mockUser];
       const code = service.recoverPassword(mockUser.email);
       expect(code).toBe('000');
     });
 
-    it('should return empty string for non-existent email', () => {
+    it('debería devolver una cadena vacía para un email inexistente', () => {
       const code = service.recoverPassword('nonexistent@example.com');
       expect(code).toBe('');
     });
   });
 
-  describe('Password Update', () => {
+  describe('Actualización de contraseña', () => {
     beforeEach(() => {
       service.login(mockUser.email, mockUser.password);
     });
 
-    // it('should update password successfully', () => {
+    // it('debería actualizar la contraseña exitosamente', () => {
     //   const newPassword = 'newpass123';
     //   (service as any).users = [mockUser];
     //   const result = service.updatePassword(mockUser.email, newPassword);
@@ -114,7 +114,7 @@ describe('AuthService', () => {
     //   expect(localStorageSpy.setItem).toHaveBeenCalledWith('users', JSON.stringify([{ ...mockUser, password: newPassword }]));
     // });
 
-    it('should fail password update for non-existent email', () => {
+    it('debería fallar la actualización de contraseña para un email inexistente', () => {
       const result = service.updatePassword('nonexistent@example.com', 'newpass');
       expect(result).toBeFalse();
       expect(localStorageSpy.setItem).not.toHaveBeenCalledWith('currentUser', jasmine.any(Object));
@@ -122,12 +122,12 @@ describe('AuthService', () => {
     });
   });
 
-  describe('Username Update', () => {
+  describe('Actualización de nombre de usuario', () => {
     beforeEach(() => {
       service.login(mockUser.email, mockUser.password);
     });
 
-    it('should update username successfully', () => {
+    it('debería actualizar el nombre de usuario exitosamente', () => {
       (service as any).users = [mockUser];
       const newUsername = 'newusername';
       const result = service.updateUsername(mockUser.email, newUsername);
@@ -136,7 +136,7 @@ describe('AuthService', () => {
       expect(localStorageSpy.setItem).toHaveBeenCalledWith('users', JSON.stringify([updatedUser]));
     });
 
-    it('should fail username update for non-existent email', () => {
+    it('debería fallar la actualización de nombre de usuario para un email inexistente', () => {
       const result = service.updateUsername('nonexistent@example.com', 'newusername');
       (service as any).users = [mockUser];
       expect(result).toBeFalse();
@@ -145,12 +145,12 @@ describe('AuthService', () => {
     });
   });
 
-  describe('Logout', () => {
+  describe('Cierre de sesión', () => {
     beforeEach(() => {
       service.login(mockUser.email, mockUser.password);
     });
 
-    it('should logout successfully', () => {
+    it('debería cerrar sesión exitosamente', () => {
       service.logout();
       expect(service.isLoggedIn()).toBeFalse();
       expect(currentUserSubject.value).toBeNull();

@@ -33,22 +33,22 @@ describe('UserAvatarComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('debería crear', () => {
     expect(component).toBeTruthy();
   });
 
-  describe('Initialization', () => {
-    it('should initialize with dropdown closed', () => {
+  describe('Inicialización', () => {
+    it('debería inicializarse con el menú desplegable cerrado', () => {
       expect(component.isDropdownOpen).toBeFalse();
     });
 
-    it('should load user from localStorage if available', () => {
+    it('debería cargar el usuario desde localStorage si está disponible', () => {
       localStorageSpy.getItem.and.returnValue(JSON.stringify(mockUser));
       component.ngOnInit();
       expect(component.currentUser).toEqual(mockUser);
     });
 
-    it('should handle missing user in localStorage', () => {
+    it('debería manejar la ausencia de usuario en localStorage', () => {
       localStorageSpy.getItem.and.returnValue(null);
       component.ngOnInit();
       expect(component.currentUser).toBeNull();
@@ -56,8 +56,8 @@ describe('UserAvatarComponent', () => {
 
   });
 
-  describe('Dropdown Functionality', () => {
-    it('should toggle dropdown state', () => {
+  describe('Funcionalidad del menú desplegable', () => {
+    it('debería alternar el estado del menú desplegable', () => {
       expect(component.isDropdownOpen).toBeFalse();
       component.toggleDropdown();
       expect(component.isDropdownOpen).toBeTrue();
@@ -65,15 +65,15 @@ describe('UserAvatarComponent', () => {
       expect(component.isDropdownOpen).toBeFalse();
     });
 
-    it('should close dropdown', () => {
+    it('debería cerrar el menú desplegable', () => {
       component.isDropdownOpen = true;
       component.closeDropdown();
       expect(component.isDropdownOpen).toBeFalse();
     });
   });
 
-  describe('Navigation', () => {
-    it('should navigate to profile and close dropdown', () => {
+  describe('Navegación', () => {
+    it('debería navegar al perfil y cerrar el menú desplegable', () => {
       const navigateSpy = spyOn(router, 'navigate');
       component.isDropdownOpen = true;
 
@@ -83,7 +83,7 @@ describe('UserAvatarComponent', () => {
       expect(component.isDropdownOpen).toBeFalse();
     });
 
-    it('should logout, clear localStorage, and navigate to login', () => {
+    it('debería cerrar sesión, limpiar localStorage y navegar al inicio de sesión', () => {
       const navigateSpy = spyOn(router, 'navigate');
       component.isDropdownOpen = true;
       component.currentUser = mockUser;
@@ -96,8 +96,8 @@ describe('UserAvatarComponent', () => {
     });
   });
 
-  describe('Click Handling', () => {
-    it('should close dropdown when clicking outside', () => {
+  describe('Manejo de clics', () => {
+    it('debería cerrar el menú desplegable al hacer clic fuera', () => {
       const mockEvent = {
         target: document.createElement('div'),
         type: 'click'
@@ -109,7 +109,7 @@ describe('UserAvatarComponent', () => {
       expect(component.isDropdownOpen).toBeFalse();
     });
 
-    it('should not close dropdown when clicking inside', () => {
+    it('no debería cerrar el menú desplegable al hacer clic dentro', () => {
       const container = document.createElement('div');
       container.className = 'user-avatar-container';
       const mockEvent = {
@@ -123,7 +123,7 @@ describe('UserAvatarComponent', () => {
       expect(component.isDropdownOpen).toBeTrue();
     });
 
-    it('should handle click on avatar container child element', () => {
+    it('debería manejar el clic en un elemento hijo del contenedor del avatar', () => {
       const container = document.createElement('div');
       container.className = 'user-avatar-container';
       const child = document.createElement('span');

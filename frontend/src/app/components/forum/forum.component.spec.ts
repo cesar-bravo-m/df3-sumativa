@@ -29,26 +29,26 @@ describe('ForumComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('debería crear', () => {
     expect(component).toBeTruthy();
   });
 
-  describe('Category Management', () => {
-    it('should toggle category expansion state', () => {
+  describe('Gestión de categorías', () => {
+    it('debería alternar el estado de expansión de la categoría', () => {
       const initialExpandedState = component.categories[0].isExpanded;
       component.toggleCategory(1);
       expect(component.categories[0].isExpanded).toBe(!initialExpandedState);
     });
 
-    it('should not modify non-existent category', () => {
+    it('no debería modificar una categoría inexistente', () => {
       const initialCategories = [...component.categories];
       component.toggleCategory(999);
       expect(component.categories).toEqual(initialCategories);
     });
   });
 
-  describe('Thread Management', () => {
-    it('should identify new threads correctly', () => {
+  describe('Gestión de hilos', () => {
+    it('debería identificar correctamente los nuevos hilos', () => {
       const newThread = {
         id: 1,
         title: 'New Thread',
@@ -61,7 +61,7 @@ describe('ForumComponent', () => {
       expect(component.isNewThread(newThread)).toBe(true);
     });
 
-    it('should identify hot threads correctly', () => {
+    it('debería identificar correctamente los hilos populares', () => {
       const hotThread = {
         id: 1,
         title: 'Hot Thread',
@@ -74,7 +74,7 @@ describe('ForumComponent', () => {
       expect(component.isHotThread(hotThread)).toBe(true);
     });
 
-    it('should create new thread in correct category', () => {
+    it('debería crear un nuevo hilo en la categoría correcta', () => {
       const categoryId = 1;
       const initialThreadCount = component.categories[0].threads.length;
 
@@ -93,8 +93,8 @@ describe('ForumComponent', () => {
     });
   });
 
-  describe('Thread Details', () => {
-    it('should open thread details with correct data', () => {
+  describe('Detalles del hilo', () => {
+    it('debería abrir los detalles del hilo con los datos correctos', () => {
       const thread = component.categories[0].threads[0];
       component.openThreadDetails(thread);
 
@@ -107,7 +107,7 @@ describe('ForumComponent', () => {
       }
     });
 
-    it('should generate placeholder comments', () => {
+    it('debería generar comentarios de marcador de posición', () => {
       const thread = component.categories[0].threads[0];
       const comments = component.generatePlaceholderComments(thread);
 
@@ -120,8 +120,8 @@ describe('ForumComponent', () => {
     });
   });
 
-  describe('Comment Handling', () => {
-    it('should handle new comments correctly', () => {
+  describe('Manejo de comentarios', () => {
+    it('debería manejar correctamente los nuevos comentarios', () => {
       const thread = component.categories[0].threads[0];
       component.openThreadDetails(thread);
 
@@ -144,8 +144,8 @@ describe('ForumComponent', () => {
     });
   });
 
-  describe('Component Lifecycle', () => {
-    it('should unsubscribe from comment subscription on destroy', () => {
+  describe('Ciclo de vida del componente', () => {
+    it('debería cancelar la suscripción a los comentarios al destruir', () => {
       const thread = component.categories[0].threads[0];
       component.openThreadDetails(thread);
 
@@ -158,8 +158,8 @@ describe('ForumComponent', () => {
     });
   });
 
-  describe('Pagination', () => {
-    it('should have correct initial pagination values', () => {
+  describe('Paginación', () => {
+    it('debería tener los valores de paginación iniciales correctos', () => {
       expect(component.currentPage).toBe(1);
       expect(component.totalPages).toBe(5);
       expect(component.threadsPerPage).toBe(10);

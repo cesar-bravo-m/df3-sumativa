@@ -36,12 +36,12 @@ describe('RegisterComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('debería crear', () => {
     expect(component).toBeTruthy();
   });
 
-  describe('Initial State', () => {
-    it('should initialize with empty form', () => {
+  describe('Estado inicial', () => {
+    it('debería inicializarse con el formulario vacío', () => {
       expect(component.registerForm.get('username')?.value).toBe('');
       expect(component.registerForm.get('email')?.value).toBe('');
       expect(component.registerForm.get('password')?.value).toBe('');
@@ -49,36 +49,36 @@ describe('RegisterComponent', () => {
     });
   });
 
-  describe('Username Validation', () => {
-    it('should require username', () => {
+  describe('Validación de nombre de usuario', () => {
+    it('debería requerir nombre de usuario', () => {
       const usernameControl = component.registerForm.get('username');
       usernameControl?.setValue('');
       expect(usernameControl?.valid).toBeFalse();
       expect(usernameControl?.errors?.['required']).toBeTruthy();
     });
 
-    it('should validate minimum length', () => {
+    it('debería validar la longitud mínima', () => {
       const usernameControl = component.registerForm.get('username');
       usernameControl?.setValue('ab');
       expect(usernameControl?.valid).toBeFalse();
       expect(usernameControl?.errors?.['minlength']).toBeTruthy();
     });
 
-    it('should validate maximum length', () => {
+    it('debería validar la longitud máxima', () => {
       const usernameControl = component.registerForm.get('username');
       usernameControl?.setValue('abcdefghijklm');
       expect(usernameControl?.valid).toBeFalse();
       expect(usernameControl?.errors?.['maxlength']).toBeTruthy();
     });
 
-    it('should validate pattern (alphanumeric only)', () => {
+    it('debería validar el patrón (solo alfanumérico)', () => {
       const usernameControl = component.registerForm.get('username');
       usernameControl?.setValue('test@user');
       expect(usernameControl?.valid).toBeFalse();
       expect(usernameControl?.errors?.['pattern']).toBeTruthy();
     });
 
-    it('should return correct username error messages', () => {
+    it('debería devolver los mensajes de error correctos para el nombre de usuario', () => {
       const usernameControl = component.registerForm.get('username');
 
       usernameControl?.setValue('');
@@ -95,36 +95,36 @@ describe('RegisterComponent', () => {
     });
   });
 
-  describe('Email Validation', () => {
-    it('should require email', () => {
+  describe('Validación de email', () => {
+    it('debería requerir email', () => {
       const emailControl = component.registerForm.get('email');
       emailControl?.setValue('');
       expect(emailControl?.valid).toBeFalse();
       expect(emailControl?.errors?.['required']).toBeTruthy();
     });
 
-    it('should validate email format', () => {
+    it('debería validar el formato del email', () => {
       const emailControl = component.registerForm.get('email');
       emailControl?.setValue('invalid-email');
       expect(emailControl?.valid).toBeFalse();
       expect(emailControl?.errors?.['email']).toBeTruthy();
     });
 
-    it('should validate TLD presence', () => {
+    it('debería validar la presencia del TLD', () => {
       const emailControl = component.registerForm.get('email');
       emailControl?.setValue('test@domain');
       expect(emailControl?.valid).toBeFalse();
       expect(emailControl?.errors?.['noTld']).toBeTruthy();
     });
 
-    it('should validate allowed TLDs', () => {
+    it('debería validar los TLDs permitidos', () => {
       const emailControl = component.registerForm.get('email');
       emailControl?.setValue('test@domain.org');
       expect(emailControl?.valid).toBeFalse();
       expect(emailControl?.errors?.['invalidTld']).toBeTruthy();
     });
 
-    it('should accept valid TLDs', () => {
+    it('debería aceptar TLDs válidos', () => {
       const emailControl = component.registerForm.get('email');
       emailControl?.setValue('test@domain.com');
       expect(emailControl?.valid).toBeTrue();
@@ -134,7 +134,7 @@ describe('RegisterComponent', () => {
       expect(emailControl?.valid).toBeTrue();
     });
 
-    it('should return correct email error messages', () => {
+    it('debería devolver los mensajes de error correctos para el email', () => {
       const emailControl = component.registerForm.get('email');
 
       emailControl?.setValue('');
@@ -151,15 +151,15 @@ describe('RegisterComponent', () => {
     });
   });
 
-  describe('Password Validation', () => {
-    it('should require password', () => {
+  describe('Validación de contraseña', () => {
+    it('debería requerir contraseña', () => {
       const passwordControl = component.registerForm.get('password');
       passwordControl?.setValue('');
       expect(passwordControl?.valid).toBeFalse();
       expect(passwordControl?.errors?.['required']).toBeTruthy();
     });
 
-    it('should validate password requirements through error messages', () => {
+    it('debería validar los requisitos de la contraseña a través de mensajes de error', () => {
       const passwordControl = component.registerForm.get('password');
 
       passwordControl?.setValue('short');
@@ -181,7 +181,7 @@ describe('RegisterComponent', () => {
       expect(component.getPasswordErrors()).toEqual([]);
     });
 
-    it('should validate password match', () => {
+    it('debería validar la coincidencia de contraseñas', () => {
       component.registerForm.patchValue({
         password: 'Valid123!',
         confirmPassword: 'Different123!'
@@ -191,8 +191,8 @@ describe('RegisterComponent', () => {
 
   });
 
-  describe('Form Submission', () => {
-    it('should handle successful registration', () => {
+  describe('Envío del formulario', () => {
+    it('debería manejar el registro exitoso', () => {
       const navigateSpy = spyOn(router, 'navigate');
       authService.register.and.returnValue(true);
 
@@ -210,7 +210,7 @@ describe('RegisterComponent', () => {
       expect(component.errorMessage).toBe('');
     });
 
-    it('should handle existing username', () => {
+    it('debería manejar un nombre de usuario existente', () => {
       authService.register.and.returnValue(false);
 
       component.registerForm.patchValue({
@@ -225,7 +225,7 @@ describe('RegisterComponent', () => {
       expect(component.errorMessage).toBe('El nombre de usuario ya existe');
     });
 
-    it('should not submit invalid form', () => {
+    it('no debería enviar un formulario inválido', () => {
       component.registerForm.patchValue({
         username: '',
         email: '',

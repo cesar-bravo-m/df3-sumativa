@@ -39,16 +39,16 @@ describe('RecoverPasswordComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('debería crear', () => {
     expect(component).toBeTruthy();
   });
 
-  describe('Initial State', () => {
-    it('should initialize with username step', () => {
+  describe('Estado inicial', () => {
+    it('debería inicializarse con el paso de nombre de usuario', () => {
       expect(component.currentStep).toBe('username');
     });
 
-    it('should initialize with empty forms', () => {
+    it('debería inicializarse con formularios vacíos', () => {
       expect(component.recoverForm.get('username')?.value).toBe('');
       expect(component.verificationForm.get('code')?.value).toBe('');
       expect(component.newPasswordForm.get('password')?.value).toBe('');
@@ -56,15 +56,15 @@ describe('RecoverPasswordComponent', () => {
     });
   });
 
-  describe('Username Step', () => {
-    it('should require username', () => {
+  describe('Paso de nombre de usuario', () => {
+    it('debería requerir nombre de usuario', () => {
       const usernameControl = component.recoverForm.get('username');
       usernameControl?.setValue('');
       expect(usernameControl?.valid).toBeFalse();
       expect(usernameControl?.errors?.['required']).toBeTruthy();
     });
 
-    it('should handle successful username submission', () => {
+    it('debería manejar el envío exitoso del nombre de usuario', () => {
       authService.recoverPassword.and.returnValue('123456');
       component.recoverForm.get('username')?.setValue('testuser');
 
@@ -76,40 +76,40 @@ describe('RecoverPasswordComponent', () => {
     });
   });
 
-  describe('Verification Step', () => {
+  describe('Paso de verificación', () => {
     beforeEach(() => {
       component.currentStep = 'verification';
       component.username = 'testuser';
     });
 
-    it('should require verification code', () => {
+    it('debería requerir código de verificación', () => {
       const codeControl = component.verificationForm.get('code');
       codeControl?.setValue('');
       expect(codeControl?.valid).toBeFalse();
       expect(codeControl?.errors?.['required']).toBeTruthy();
     });
 
-    it('should validate verification code format', () => {
+    it('debería validar el formato del código de verificación', () => {
       const codeControl = component.verificationForm.get('code');
       codeControl?.setValue('123');
       expect(codeControl?.valid).toBeFalse();
       expect(codeControl?.errors?.['pattern']).toBeTruthy();
     });
 
-    it('should proceed to new password step with valid code', () => {
+    it('debería proceder al paso de nueva contraseña con código válido', () => {
       component.verificationForm.get('code')?.setValue('000');
       component.onSubmitVerification();
       expect(component.currentStep).toBe('newPassword');
     });
   });
 
-  describe('New Password Step', () => {
+  describe('Paso de nueva contraseña', () => {
     beforeEach(() => {
       component.currentStep = 'newPassword';
       component.username = 'testuser';
     });
 
-    it('should validate password requirements', () => {
+    it('debería validar los requisitos de la contraseña', () => {
       const passwordControl = component.newPasswordForm.get('password');
 
       passwordControl?.setValue('short');
@@ -135,7 +135,7 @@ describe('RecoverPasswordComponent', () => {
       expect(component.hasSpecialChar()).toBeTrue();
     });
 
-    it('should validate password match', () => {
+    it('debería validar la coincidencia de contraseñas', () => {
       component.newPasswordForm.patchValue({
         password: 'Valid123!',
         confirmPassword: 'Different123!'
@@ -143,7 +143,7 @@ describe('RecoverPasswordComponent', () => {
       expect(component.newPasswordForm.errors?.['mismatch']).toBeTruthy();
     });
 
-    it('should handle successful password update', () => {
+    it('debería manejar la actualización exitosa de contraseña', () => {
       const navigateSpy = spyOn(router, 'navigate');
       authService.updatePassword.and.returnValue(true);
 
@@ -158,7 +158,7 @@ describe('RecoverPasswordComponent', () => {
       expect(navigateSpy).toHaveBeenCalledWith(['/login']);
     });
 
-    it('should handle failed password update', () => {
+    it('debería manejar la actualización fallida de contraseña', () => {
       authService.updatePassword.and.returnValue(false);
 
       component.newPasswordForm.patchValue({
@@ -172,8 +172,8 @@ describe('RecoverPasswordComponent', () => {
     });
   });
 
-  describe('Error Messages', () => {
-    it('should return correct password error messages', () => {
+  describe('Mensajes de error', () => {
+    it('debería devolver los mensajes de error correctos para la contraseña', () => {
       const passwordControl = component.newPasswordForm.get('password');
 
       passwordControl?.setValue('short');

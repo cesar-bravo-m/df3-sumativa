@@ -50,23 +50,23 @@ describe('ProfileComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('debería crear', () => {
     expect(component).toBeTruthy();
   });
 
-  describe('Initialization', () => {
-    it('should initialize with current user data', () => {
+  describe('Inicialización', () => {
+    it('debería inicializarse con los datos del usuario actual', () => {
       expect(component.currentUser).toEqual(mockUser);
       expect(component.profileForm.get('username')?.value).toBe(mockUser.username);
     });
 
-    it('should redirect to login if no user is logged in', () => {
+    it('debería redirigir al inicio de sesión si no hay usuario conectado', () => {
       const navigateSpy = spyOn(router, 'navigate');
       currentUserSubject.next(null);
       expect(navigateSpy).toHaveBeenCalledWith(['/login']);
     });
 
-    it('should handle confirm password validation when new password changes', () => {
+    it('debería manejar la validación de confirmación de contraseña cuando cambia la nueva contraseña', () => {
       const confirmPasswordControl = component.profileForm.get('confirmPassword');
 
       // When new password is empty, confirm password should not be required
@@ -79,43 +79,43 @@ describe('ProfileComponent', () => {
     });
   });
 
-  describe('Form Validation', () => {
-    it('should mark username as invalid when empty', () => {
+  describe('Validación del formulario', () => {
+    it('debería marcar el nombre de usuario como inválido cuando está vacío', () => {
       const usernameControl = component.profileForm.get('username');
       usernameControl?.setValue('');
       expect(usernameControl?.valid).toBeFalse();
       expect(usernameControl?.errors?.['required']).toBeTruthy();
     });
 
-    it('should mark username as invalid when too short', () => {
+    it('debería marcar el nombre de usuario como inválido cuando es demasiado corto', () => {
       const usernameControl = component.profileForm.get('username');
       usernameControl?.setValue('ab');
       expect(usernameControl?.valid).toBeFalse();
       expect(usernameControl?.errors?.['minlength']).toBeTruthy();
     });
 
-    it('should mark username as invalid when too long', () => {
+    it('debería marcar el nombre de usuario como inválido cuando es demasiado largo', () => {
       const usernameControl = component.profileForm.get('username');
       usernameControl?.setValue('abcdefghijklm');
       expect(usernameControl?.valid).toBeFalse();
       expect(usernameControl?.errors?.['maxlength']).toBeTruthy();
     });
 
-    it('should mark username as invalid with special characters', () => {
+    it('debería marcar el nombre de usuario como inválido con caracteres especiales', () => {
       const usernameControl = component.profileForm.get('username');
       usernameControl?.setValue('test@user');
       expect(usernameControl?.valid).toBeFalse();
       expect(usernameControl?.errors?.['pattern']).toBeTruthy();
     });
 
-    it('should require current password', () => {
+    it('debería requerir la contraseña actual', () => {
       const passwordControl = component.profileForm.get('currentPassword');
       passwordControl?.setValue('');
       expect(passwordControl?.valid).toBeFalse();
       expect(passwordControl?.errors?.['required']).toBeTruthy();
     });
 
-    it('should validate password match', () => {
+    it('debería validar la coincidencia de contraseñas', () => {
       component.profileForm.patchValue({
         newPassword: 'newpass123',
         confirmPassword: 'differentpass'
@@ -123,7 +123,7 @@ describe('ProfileComponent', () => {
       expect(component.profileForm.errors?.['mismatch']).toBeTruthy();
     });
 
-    it('should not show password mismatch error when new password is empty', () => {
+    it('no debería mostrar el error de no coincidencia de contraseñas cuando la nueva contraseña está vacía', () => {
       component.profileForm.patchValue({
         newPassword: '',
         confirmPassword: 'anyvalue'
@@ -132,36 +132,36 @@ describe('ProfileComponent', () => {
     });
   });
 
-  describe('Password Validation', () => {
-    it('should validate minimum length', () => {
+  describe('Validación de contraseña', () => {
+    it('debería validar la longitud mínima', () => {
       component.profileForm.get('newPassword')?.setValue('short');
       expect(component.hasMinLength()).toBeFalse();
       component.profileForm.get('newPassword')?.setValue('longenough');
       expect(component.hasMinLength()).toBeTrue();
     });
 
-    it('should validate maximum length', () => {
+    it('debería validar la longitud máxima', () => {
       component.profileForm.get('newPassword')?.setValue('a'.repeat(33));
       expect(component.hasMaxLength()).toBeFalse();
       component.profileForm.get('newPassword')?.setValue('a'.repeat(32));
       expect(component.hasMaxLength()).toBeTrue();
     });
 
-    it('should validate letter requirement', () => {
+    it('debería validar el requisito de letras', () => {
       component.profileForm.get('newPassword')?.setValue('12345678');
       expect(component.hasLetter()).toBeFalse();
       component.profileForm.get('newPassword')?.setValue('abc12345');
       expect(component.hasLetter()).toBeTrue();
     });
 
-    it('should validate number requirement', () => {
+    it('debería validar el requisito de números', () => {
       component.profileForm.get('newPassword')?.setValue('abcdefgh');
       expect(component.hasNumber()).toBeFalse();
       component.profileForm.get('newPassword')?.setValue('abc12345');
       expect(component.hasNumber()).toBeTrue();
     });
 
-    it('should validate special character requirement', () => {
+    it('debería validar el requisito de caracteres especiales', () => {
       component.profileForm.get('newPassword')?.setValue('abc12345');
       expect(component.hasSpecialChar()).toBeFalse();
       component.profileForm.get('newPassword')?.setValue('abc123!@#');
@@ -169,8 +169,8 @@ describe('ProfileComponent', () => {
     });
   });
 
-  describe('Error Messages', () => {
-    it('should return correct username error messages', () => {
+  describe('Mensajes de error', () => {
+    it('debería devolver los mensajes de error correctos para el nombre de usuario', () => {
       const usernameControl = component.profileForm.get('username');
 
       usernameControl?.setValue('');
@@ -186,7 +186,7 @@ describe('ProfileComponent', () => {
       expect(component.getUsernameErrors()).toContain('El nombre de usuario no puede contener caracteres especiales');
     });
 
-    it('should return correct password error messages', () => {
+    it('debería devolver los mensajes de error correctos para la contraseña', () => {
       const passwordControl = component.profileForm.get('newPassword');
 
       passwordControl?.setErrors({ minLength: true });
@@ -206,8 +206,8 @@ describe('ProfileComponent', () => {
     });
   });
 
-  describe('Form Submission', () => {
-    it('should handle successful username update', () => {
+  describe('Envío del formulario', () => {
+    it('debería manejar la actualización exitosa del nombre de usuario', () => {
       authService.login.and.returnValue(true);
       authService.updateUsername.and.returnValue(true);
 
@@ -223,7 +223,7 @@ describe('ProfileComponent', () => {
       expect(component.errorMessage).toBe('');
     });
 
-    it('should handle successful password update', () => {
+    it('debería manejar la actualización exitosa de la contraseña', () => {
       authService.login.and.returnValue(true);
       authService.updatePassword.and.returnValue(true);
 
@@ -241,7 +241,7 @@ describe('ProfileComponent', () => {
       expect(component.errorMessage).toBe('');
     });
 
-    it('should handle incorrect current password', () => {
+    it('debería manejar la contraseña actual incorrecta', () => {
       authService.login.and.returnValue(false);
 
       component.profileForm.patchValue({
@@ -255,7 +255,7 @@ describe('ProfileComponent', () => {
       expect(component.successMessage).toBe('');
     });
 
-    it('should handle failed username update', () => {
+    it('debería manejar la actualización fallida del nombre de usuario', () => {
       authService.login.and.returnValue(true);
       authService.updateUsername.and.returnValue(false);
 
@@ -270,7 +270,7 @@ describe('ProfileComponent', () => {
       expect(component.successMessage).toBe('');
     });
 
-    it('should handle failed password update', () => {
+    it('debería manejar la actualización fallida de la contraseña', () => {
       authService.login.and.returnValue(true);
       authService.updatePassword.and.returnValue(false);
 
@@ -287,7 +287,7 @@ describe('ProfileComponent', () => {
       expect(component.successMessage).toBe('');
     });
 
-    it('should not submit if form is invalid', () => {
+    it('no debería enviar si el formulario es inválido', () => {
       component.profileForm.patchValue({
         username: '',
         currentPassword: ''
@@ -300,7 +300,7 @@ describe('ProfileComponent', () => {
       expect(authService.updatePassword).not.toHaveBeenCalled();
     });
 
-    it('should clear form fields after successful password update', () => {
+    it('debería limpiar los campos del formulario después de una actualización exitosa de contraseña', () => {
       authService.login.and.returnValue(true);
       authService.updatePassword.and.returnValue(true);
 
@@ -319,8 +319,8 @@ describe('ProfileComponent', () => {
     });
   });
 
-  describe('Logout', () => {
-    it('should logout and navigate to login', () => {
+  describe('Cierre de sesión', () => {
+    it('debería cerrar sesión y navegar al inicio de sesión', () => {
       const navigateSpy = spyOn(router, 'navigate');
       component.logout();
       expect(authService.logout).toHaveBeenCalled();

@@ -17,22 +17,22 @@ describe('NewThreadModalComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('debería crear', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize with modal closed', () => {
+  it('debería inicializarse con el modal cerrado', () => {
     expect(component.isOpen).toBeFalse();
     expect(component.threadTitle).toBe('');
     expect(component.threadContent).toBe('');
   });
 
-  it('should open the modal', () => {
+  it('debería abrir el modal', () => {
     component.open();
     expect(component.isOpen).toBeTrue();
   });
 
-  it('should close the modal and reset form', () => {
+  it('debería cerrar el modal y reiniciar el formulario', () => {
     // Set some values first
     component.isOpen = true;
     component.threadTitle = 'Test Title';
@@ -49,7 +49,7 @@ describe('NewThreadModalComponent', () => {
     expect(component.closeModal.emit).toHaveBeenCalled();
   });
 
-  it('should not submit thread with empty title and content', () => {
+  it('no debería enviar un hilo con título y contenido vacíos', () => {
     spyOn(component.createThread, 'emit');
 
     component.submitThread();
@@ -57,7 +57,7 @@ describe('NewThreadModalComponent', () => {
     expect(component.createThread.emit).not.toHaveBeenCalled();
   });
 
-  it('should submit thread with valid title and content', () => {
+  it('debería enviar un hilo con título y contenido válidos', () => {
     spyOn(component.createThread, 'emit');
 
     component.threadTitle = 'Test Title';
@@ -70,7 +70,7 @@ describe('NewThreadModalComponent', () => {
     });
   });
 
-  it('should close modal after successful thread submission', () => {
+  it('debería cerrar el modal después del envío exitoso del hilo', () => {
     spyOn(component, 'close');
 
     component.threadTitle = 'Test Title';
@@ -80,7 +80,7 @@ describe('NewThreadModalComponent', () => {
     expect(component.close).toHaveBeenCalled();
   });
 
-  it('should close modal when clicking the overlay', () => {
+  it('debería cerrar el modal al hacer clic en el overlay', () => {
     component.isOpen = true;
     fixture.detectChanges();
 
