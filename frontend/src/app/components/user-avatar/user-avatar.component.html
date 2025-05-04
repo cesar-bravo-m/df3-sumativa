@@ -1,5 +1,5 @@
 <div class="user-avatar-container">
-  <div class="avatar" (click)="toggleDropdown()">
+  <div class="avatar" (click)="toggleDropdown()" style>
      <div class="avatar-icon">
       <i class="material-icons">person</i>
      </div>
@@ -7,7 +7,7 @@
 
   <div class="dropdown-menu" *ngIf="isDropdownOpen">
     <div class="user-info">
-      <div class="avatar-icon">
+      <div class="avatar-icon" style="margin-right: 10px;">
         <i class="material-icons">person</i>
       </div>
       <div class="user-details">

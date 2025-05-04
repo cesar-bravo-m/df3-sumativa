@@ -67,6 +67,7 @@ export class AuthService {
           };
           console.log("### response", response);
           this.currentUserSubject.next(user);
+          localStorage.setItem('currentUser', JSON.stringify(user));
           localStorage.setItem('token', response.accessToken);
         })
       );
@@ -89,16 +90,35 @@ export class AuthService {
     return true;
   }
 
-  getUserIdFromEmail(email: string): Observable<number> {
+  getUserFromEmail(email: string): Observable<User> {
     console.log("### getUserIdFrom Email ", email);
-    return this.http.get(`${this.API_URL}/api/users/email/${email}`).pipe(
-      map((response: any) => response.id)
+    const token = this.getToken();
+    console.log("### getUserIdFrom Email - Token:", token);
+    const response = this.http.get(`${this.API_URL}/api/users/email/${email}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }).pipe(
+      map((response: any) => response)
     );
+    console.log("### getUserIdFrom Email - Response:", response);
+    return response;
   }
 
   updatePassword(email: string, password: string): Observable<boolean> {
-    return this.getUserIdFromEmail(email).pipe(
-      switchMap((userId: number) => this.http.put<boolean>(`${this.API_URL}/api/auth/update/${userId}`, { password }))
+    console.log("### updatePassword - Starting password update for email:", email);
+    return this.getUserFromEmail(email).pipe(
+      tap(user => console.log("### updatePassword - Got user:", user)),
+      switchMap((user: User) => {
+        console.log("### updatePassword - Making update request with token:", this.getToken());
+        return this.http.put<boolean>(`${this.API_URL}/api/users/${user.id}`,
+          {
+            username: user.username,
+            email: user.email,
+            role: user.role,
+            password: password
+          });
+      })
     );
   }
 
@@ -135,9 +155,18 @@ export class AuthService {
     return this.currentUserSubject.value?.role === 'MODERATOR';
   }
 
-  // The endpoint for all "updateXXX" methods is /api/users/{id}
-  updateUsername(id: number, newUsername: string): Observable<any> {
-    return this.http.put(`${this.API_URL}/api/users/${id}`, { username: newUsername });
+  updateUsername(email: string, newUsername: string): Observable<any> {
+    console.log("### updateUsername - Starting username update for email:", email);
+    return this.getUserFromEmail(email).pipe(
+      tap(user => console.log("### updateUsername - Got user:", user)),
+      switchMap((user: User) => this.http.put<boolean>(`${this.API_URL}/api/users/${user.id}`,
+        {
+          username: newUsername,
+          email: user.email,
+          role: user.role,
+          password: 'null' // valor mágico para que no se actualice la contraseña
+        }))
+    );
   }
 
   updateEmail(id: number, newEmail: string): Observable<any> {

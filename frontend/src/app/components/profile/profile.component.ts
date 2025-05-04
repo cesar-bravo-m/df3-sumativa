@@ -30,7 +30,6 @@ export class ProfileComponent implements OnInit {
         Validators.maxLength(32),
         Validators.pattern('^[a-zA-Z0-9]+$')
       ]],
-      currentPassword: ['', [Validators.required]],
       newPassword: [''],
       confirmPassword: ['']
     }, { validator: this.passwordMatchValidator });
@@ -73,46 +72,56 @@ export class ProfileComponent implements OnInit {
 
   onSubmit(): void {
     if (this.profileForm.valid) {
-      const { username, currentPassword, newPassword } = this.profileForm.value;
+      const { username, newPassword } = this.profileForm.value;
 
-      if (this.authService.login(this.currentUser.email, currentPassword)) {
-        let updateSuccess = true;
-
-        if (username !== this.currentUser.username) {
-          if (!this.authService.updateUsername(this.currentUser.email, username)) {
-            this.errorMessage = 'Error al actualizar el nombre de usuario';
-            this.successMessage = '';
-            updateSuccess = false;
-          }
-        }
-
-        if (newPassword && newPassword.length > 0 && updateSuccess) {
-          this.authService.updatePassword(this.currentUser.email, newPassword).subscribe((response: any) => {
+      if (username !== this.currentUser.username) {
+        this.authService.updateUsername(this.currentUser.email, username).subscribe({
+          next: (response) => {
             if (response) {
-              this.successMessage = 'Perfil actualizado exitosamente';
-              this.errorMessage = '';
-              this.profileForm.patchValue({
-                currentPassword: '',
-                newPassword: '',
-                confirmPassword: ''
-              });
+              if (newPassword && newPassword.length > 0) {
+                this.updatePassword(newPassword);
+              } else {
+                this.successMessage = 'Nombre de usuario actualizado exitosamente';
+                this.errorMessage = '';
+                // update the username in the currentUser
+                this.currentUser.username = username;
+              }
             } else {
-              this.errorMessage = 'Error al actualizar la contraseña';
+              this.errorMessage = 'Error al actualizar el nombre de usuario';
               this.successMessage = '';
             }
-          });
-        } else if (updateSuccess) {
-          this.successMessage = 'Nombre de usuario actualizado exitosamente';
-          this.errorMessage = '';
-          this.profileForm.patchValue({
-            currentPassword: ''
-          });
-        }
-      } else {
-        this.errorMessage = 'La contraseña actual es incorrecta';
-        this.successMessage = '';
+          },
+          error: (error) => {
+            this.errorMessage = 'Error al actualizar el nombre de usuario';
+            this.successMessage = '';
+          }
+        });
+      } else if (newPassword && newPassword.length > 0) {
+        this.updatePassword(newPassword);
       }
     }
+  }
+
+  private updatePassword(newPassword: string): void {
+    this.authService.updatePassword(this.currentUser.email, newPassword).subscribe({
+      next: (response) => {
+        if (response) {
+          this.successMessage = 'Perfil actualizado exitosamente';
+          this.errorMessage = '';
+          this.profileForm.patchValue({
+            newPassword: '',
+            confirmPassword: ''
+          });
+        } else {
+          this.errorMessage = 'Error al actualizar la contraseña';
+          this.successMessage = '';
+        }
+      },
+      error: (error) => {
+        this.errorMessage = 'Error al actualizar la contraseña';
+        this.successMessage = '';
+      }
+    });
   }
 
   getPasswordErrors(): string[] {
@@ -164,6 +173,22 @@ export class ProfileComponent implements OnInit {
   hasSpecialChar(): boolean {
     const password = this.profileForm.get('newPassword')?.value || '';
     return /[!@#$%^&*(),.?":{}|<>]/.test(password);
+  }
+
+  // Username validation methods
+  hasUsernameMinLength(): boolean {
+    const username = this.profileForm.get('username')?.value || '';
+    return username.length >= 3;
+  }
+
+  hasUsernameMaxLength(): boolean {
+    const username = this.profileForm.get('username')?.value || '';
+    return username.length <= 32;
+  }
+
+  hasValidUsernameChars(): boolean {
+    const username = this.profileForm.get('username')?.value || '';
+    return /^[a-zA-Z0-9]+$/.test(username);
   }
 
   getUsernameErrors(): string[] {

@@ -108,13 +108,6 @@ describe('ProfileComponent', () => {
       expect(usernameControl?.errors?.['pattern']).toBeTruthy();
     });
 
-    it('debería requerir la contraseña actual', () => {
-      const passwordControl = component.profileForm.get('currentPassword');
-      passwordControl?.setValue('');
-      expect(passwordControl?.valid).toBeFalse();
-      expect(passwordControl?.errors?.['required']).toBeTruthy();
-    });
-
     it('debería validar la coincidencia de contraseñas', () => {
       component.profileForm.patchValue({
         newPassword: 'newpass123',
@@ -239,20 +232,6 @@ describe('ProfileComponent', () => {
       expect(authService.updatePassword).toHaveBeenCalledWith(mockUser.email, 'newpass123!');
       expect(component.successMessage).toBe('Perfil actualizado exitosamente');
       expect(component.errorMessage).toBe('');
-    });
-
-    it('debería manejar la contraseña actual incorrecta', () => {
-      authService.login.and.returnValue(false);
-
-      component.profileForm.patchValue({
-        username: 'newusername',
-        currentPassword: 'wrongpass'
-      });
-
-      component.onSubmit();
-
-      expect(component.errorMessage).toBe('La contraseña actual es incorrecta');
-      expect(component.successMessage).toBe('');
     });
 
     it('debería manejar la actualización fallida del nombre de usuario', () => {
