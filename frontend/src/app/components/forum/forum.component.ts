@@ -249,6 +249,66 @@ export class ForumComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
+  onAddComment(event: {threadId: number, content: string}) {
+    if (!this.currentUserId) {
+      console.error('No user ID available');
+      return;
+    }
+
+    this.threadModal.isSubmitting = true;
+    const newPost: PostDto = {
+      id: 0,
+      content: event.content,
+      createdAt: new Date().toISOString(),
+      lastUpdatedAt: new Date().toISOString(),
+      userId: this.currentUserId,
+      threadId: event.threadId,
+      threadTitle: this.threadModal.thread?.title || ''
+    };
+
+    this.bbsService.createPost(newPost).subscribe({
+      next: (response) => {
+        this.loadThreadDetails(event.threadId);
+        this.threadModal.newComment = '';
+        this.threadModal.isSubmitting = false;
+      },
+      error: (error) => {
+        console.error('Error creating comment:', error);
+        this.threadModal.error = 'Error al publicar el comentario. Por favor, intenta nuevamente.';
+        this.threadModal.isSubmitting = false;
+      }
+    });
+  }
+
+  private loadThreadDetails(threadId: number) {
+    this.bbsService.getThreadById(threadId).subscribe({
+      next: (thread) => {
+        if (this.threadModal.thread?.id === threadId) {
+          // Convert ThreadDto to ThreadDetails
+          this.threadModal.thread = {
+            id: thread.id,
+            title: thread.title,
+            author: 'Usuario ' + thread.userId, // This should come from a user service
+            content: thread.posts[0]?.content || '',
+            lastActivity: thread.lastUpdatedAt,
+            replies: thread.posts.length - 1,
+            views: 0, // This should come from the API
+            createdAt: thread.createdAt,
+            comments: thread.posts.slice(1).map(post => ({
+              id: post.id,
+              author: 'Usuario ' + post.userId, // This should come from a user service
+              content: post.content,
+              createdAt: post.createdAt
+            }))
+          };
+        }
+      },
+      error: (error) => {
+        console.error('Error loading thread details:', error);
+      }
+    });
+  }
+
   ngOnDestroy() {
     if (this.commentSubscription) {
       this.commentSubscription.unsubscribe();

@@ -66,9 +66,13 @@ interface ThreadDetails {
                     [(ngModel)]="newComment"
                     name="comment"
                     placeholder="Escribe tu comentario aquí..."
+                    [disabled]="isSubmitting"
                     required></textarea>
                 </div>
-                <button type="submit" class="submit-btn">Publicar Comentario</button>
+                <div class="error-message" *ngIf="error">{{error}}</div>
+                <button type="submit" class="submit-btn" [disabled]="isSubmitting">
+                  {{isSubmitting ? 'Publicando...' : 'Publicar Comentario'}}
+                </button>
               </form>
             </div>
           </div>
@@ -190,19 +194,33 @@ interface ThreadDetails {
     .add-comment-form .submit-btn:hover {
       background: #0056b3;
     }
+
+    .add-comment-form .submit-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    .error-message {
+      color: #dc3545;
+      margin-bottom: 10px;
+      font-size: 0.9em;
+    }
   `]
 })
 export class ThreadDetailsModalComponent implements OnChanges {
   @Input() thread?: ThreadDetails;
+  @Input() currentUserId?: number;
+  @Input() currentUsername?: string;
   @Output() closeModal = new EventEmitter<void>();
-  @Output() addNewComment = new EventEmitter<Comment>();
+  @Output() addNewComment = new EventEmitter<{threadId: number, content: string}>();
 
   isOpen = false;
   newComment = '';
+  isSubmitting = false;
+  error: string | null = null;
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['thread'] && this.thread) {
-      // Ensure comments are properly initialized
       if (!this.thread.comments) {
         this.thread.comments = [];
       }
@@ -216,23 +234,24 @@ export class ThreadDetailsModalComponent implements OnChanges {
   close() {
     this.isOpen = false;
     this.newComment = '';
+    this.error = null;
     this.closeModal.emit();
   }
 
   addComment() {
-    if (this.newComment.trim() && this.thread) {
-      const comment: Comment = {
-        id: this.thread.comments.length + 1,
-        author: 'Usuario Actual', // This should come from your auth service
-        content: this.newComment.trim(),
-        createdAt: new Date().toISOString()
-      };
-
-      // Only emit the event, don't update the thread directly
-      this.addNewComment.emit(comment);
-
-      // Clear the form
-      this.newComment = '';
+    console.log("### this.thread", this.thread);
+    console.log("### this.newComment", this.newComment);
+    if (!this.newComment.trim() || !this.thread) {
+      this.error = 'Por favor, escribe un comentario.';
+      return;
     }
+
+    this.isSubmitting = true;
+    this.error = null;
+
+    this.addNewComment.emit({
+      threadId: this.thread.id,
+      content: this.newComment.trim()
+    });
   }
 }

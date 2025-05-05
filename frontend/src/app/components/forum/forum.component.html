@@ -1,6 +1,10 @@
 <div class="forum-container">
   <app-new-thread-modal></app-new-thread-modal>
-  <app-thread-details-modal></app-thread-details-modal>
+  <app-thread-details-modal
+    (addNewComment)="onAddComment($event)"
+    [currentUserId]="currentUserId ?? undefined"
+    [currentUsername]="'Usuario ' + (currentUserId ?? '')">
+  </app-thread-details-modal>
   <div class="forum-header">
     <div class="header-content">
       <h1>Foro DUOC</h1>

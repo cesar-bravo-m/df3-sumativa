@@ -79,7 +79,6 @@ describe('ForumComponent', () => {
       const initialThreadCount = component.categories[0].threads.length;
 
       component.createNewThread(categoryId);
-      // Simulate modal subscription
       component.modal.createThread.next({
         title: 'Test Thread',
         content: 'Test Content'
