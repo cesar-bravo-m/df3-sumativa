@@ -1,35 +1,32 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { UserAvatarComponent } from './user-avatar.component';
-import { Router } from '@angular/router';
-import { RouterTestingModule } from '@angular/router/testing';
-import { CommonModule } from '@angular/common';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { AuthService } from '../../services/auth.service';
+import { of } from 'rxjs';
 
 describe('UserAvatarComponent', () => {
   let component: UserAvatarComponent;
   let fixture: ComponentFixture<UserAvatarComponent>;
-  let router: Router;
-  let localStorageSpy: jasmine.SpyObj<Storage>;
-
-  const mockUser = {
-    username: 'testuser',
-    email: 'test@example.com'
-  };
+  let authService: jasmine.SpyObj<AuthService>;
 
   beforeEach(async () => {
-    localStorageSpy = jasmine.createSpyObj('localStorage', ['getItem', 'removeItem']);
-    Object.defineProperty(window, 'localStorage', { value: localStorageSpy });
+    const authSpy = jasmine.createSpyObj('AuthService', ['logout'], {
+      currentUser$: of({ id: 1, username: 'testuser', email: 'test@example.com', role: 'NORMAL_POSTER' })
+    });
 
     await TestBed.configureTestingModule({
       imports: [
-        CommonModule,
-        RouterTestingModule,
-        UserAvatarComponent
+        UserAvatarComponent,
+        HttpClientTestingModule
+      ],
+      providers: [
+        { provide: AuthService, useValue: authSpy }
       ]
     }).compileComponents();
 
+    authService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
     fixture = TestBed.createComponent(UserAvatarComponent);
     component = fixture.componentInstance;
-    router = TestBed.inject(Router);
     fixture.detectChanges();
   });
 
@@ -37,106 +34,69 @@ describe('UserAvatarComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  describe('Inicialización', () => {
-    it('debería inicializarse con el menú desplegable cerrado', () => {
-      expect(component.isDropdownOpen).toBeFalse();
-    });
-
-    it('debería cargar el usuario desde localStorage si está disponible', () => {
-      localStorageSpy.getItem.and.returnValue(JSON.stringify(mockUser));
-      component.ngOnInit();
-      expect(component.currentUser).toEqual(mockUser);
-    });
-
-    it('debería manejar la ausencia de usuario en localStorage', () => {
-      localStorageSpy.getItem.and.returnValue(null);
-      component.ngOnInit();
-      expect(component.currentUser).toBeNull();
-    });
-
-  });
-
   describe('Funcionalidad del menú desplegable', () => {
-    it('debería alternar el estado del menú desplegable', () => {
-      expect(component.isDropdownOpen).toBeFalse();
-      component.toggleDropdown();
+    it('debería alternar el menú desplegable al hacer clic en el avatar', () => {
+      const avatarElement = fixture.nativeElement.querySelector('.avatar');
+      avatarElement.click();
       expect(component.isDropdownOpen).toBeTrue();
-      component.toggleDropdown();
+      avatarElement.click();
       expect(component.isDropdownOpen).toBeFalse();
     });
 
-    it('debería cerrar el menú desplegable', () => {
+    it('debería cerrar el menú desplegable al hacer clic fuera', () => {
       component.isDropdownOpen = true;
-      component.closeDropdown();
-      expect(component.isDropdownOpen).toBeFalse();
-    });
-  });
+      fixture.detectChanges();
 
-  describe('Navegación', () => {
-    it('debería navegar al perfil y cerrar el menú desplegable', () => {
-      const navigateSpy = spyOn(router, 'navigate');
-      component.isDropdownOpen = true;
+      const event = new MouseEvent('click', {
+        bubbles: true,
+        cancelable: true,
+        view: window
+      });
+      document.dispatchEvent(event);
 
-      component.goToProfile();
-
-      expect(navigateSpy).toHaveBeenCalledWith(['/profile']);
       expect(component.isDropdownOpen).toBeFalse();
     });
 
-    it('debería cerrar sesión, limpiar localStorage y navegar al inicio de sesión', () => {
-      const navigateSpy = spyOn(router, 'navigate');
+    it('debería mantener el menú abierto al hacer clic dentro', () => {
       component.isDropdownOpen = true;
-      component.currentUser = mockUser;
+      fixture.detectChanges();
 
-      component.logout();
+      const dropdownMenu = fixture.nativeElement.querySelector('.dropdown-menu');
+      const event = new MouseEvent('click', {
+        bubbles: true,
+        cancelable: true,
+        view: window
+      });
+      dropdownMenu.dispatchEvent(event);
 
-      expect(localStorageSpy.removeItem).toHaveBeenCalledWith('currentUser');
-      expect(navigateSpy).toHaveBeenCalledWith(['/login']);
-      expect(component.isDropdownOpen).toBeFalse();
+      expect(component.isDropdownOpen).toBeTrue();
     });
   });
 
   describe('Manejo de clics', () => {
     it('debería cerrar el menú desplegable al hacer clic fuera', () => {
-      const mockEvent = {
-        target: document.createElement('div'),
-        type: 'click'
-      } as unknown as MouseEvent;
-
       component.isDropdownOpen = true;
-      component.onDocumentClick(mockEvent);
+      fixture.detectChanges();
+
+      const event = new MouseEvent('click', {
+        bubbles: true,
+        cancelable: true,
+        view: window
+      });
+      document.dispatchEvent(event);
 
       expect(component.isDropdownOpen).toBeFalse();
     });
 
-    it('no debería cerrar el menú desplegable al hacer clic dentro', () => {
-      const container = document.createElement('div');
-      container.className = 'user-avatar-container';
-      const mockEvent = {
-        target: container,
-        type: 'click'
-      } as unknown as MouseEvent;
-
+    it('debería llamar a logout() al hacer clic en el botón de cerrar sesión', () => {
       component.isDropdownOpen = true;
-      component.onDocumentClick(mockEvent);
+      fixture.detectChanges();
 
-      expect(component.isDropdownOpen).toBeTrue();
-    });
+      const logoutButton = fixture.nativeElement.querySelector('.logout-button');
+      logoutButton.click();
 
-    it('debería manejar el clic en un elemento hijo del contenedor del avatar', () => {
-      const container = document.createElement('div');
-      container.className = 'user-avatar-container';
-      const child = document.createElement('span');
-      container.appendChild(child);
-      const mockEvent = {
-        target: child,
-        type: 'click'
-      } as unknown as MouseEvent;
-
-      component.isDropdownOpen = true;
-      component.onDocumentClick(mockEvent);
-
-      expect(component.isDropdownOpen).toBeTrue();
+      expect(authService.logout).toHaveBeenCalled();
+      expect(component.isDropdownOpen).toBeFalse();
     });
   });
 });

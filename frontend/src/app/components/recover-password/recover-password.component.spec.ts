@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { ValidationService } from '../../services/validation.service';
+import { of } from 'rxjs';
 
 describe('RecoverPasswordComponent', () => {
   let component: RecoverPasswordComponent;
@@ -65,7 +66,7 @@ describe('RecoverPasswordComponent', () => {
     });
 
     it('debería manejar el envío exitoso del nombre de usuario', () => {
-      authService.recoverPassword.and.returnValue('123456');
+      authService.recoverPassword.and.returnValue(of('000'));
       component.recoverForm.get('username')?.setValue('testuser');
 
       component.onSubmitEmail();
@@ -145,7 +146,7 @@ describe('RecoverPasswordComponent', () => {
 
     it('debería manejar la actualización exitosa de contraseña', () => {
       const navigateSpy = spyOn(router, 'navigate');
-      authService.updatePassword.and.returnValue(true);
+      authService.updatePassword.and.returnValue(of(true));
 
       component.newPasswordForm.patchValue({
         password: 'Valid123!',
@@ -159,7 +160,7 @@ describe('RecoverPasswordComponent', () => {
     });
 
     it('debería manejar la actualización fallida de contraseña', () => {
-      authService.updatePassword.and.returnValue(false);
+      authService.updatePassword.and.returnValue(of(false));
 
       component.newPasswordForm.patchValue({
         password: 'Valid123!',

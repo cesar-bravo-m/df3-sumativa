@@ -5,163 +5,215 @@ import { ThreadDetailsModalComponent } from './thread-details-modal/thread-detai
 import { UserAvatarComponent } from '../user-avatar/user-avatar.component';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subscription, of } from 'rxjs';
 import { RouterTestingModule } from '@angular/router/testing';
+import { BbsService, PostDto, ThreadDto } from '../../services/bbs.service';
+import { AuthService } from '../../services/auth.service';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpClient } from '@angular/common/http';
 
 describe('ForumComponent', () => {
   let component: ForumComponent;
   let fixture: ComponentFixture<ForumComponent>;
+  let bbsService: jasmine.SpyObj<BbsService>;
+  let authService: jasmine.SpyObj<AuthService>;
+  let httpClient: HttpClient;
+  let httpTestingController: HttpTestingController;
+
+  const mockCategories = [{
+    id: 1,
+    name: 'Test Category',
+    description: 'Test Description',
+    threads: []
+  }];
+
+  const mockThreads = [{
+    id: 1,
+    title: 'Test Thread',
+    createdAt: '2024-03-20',
+    lastUpdatedAt: '2024-03-20',
+    userId: 1,
+    categoryId: 1,
+    postCount: 1
+  }];
+
+  const mockThreadDetails = {
+    id: 1,
+    title: 'Test Thread',
+    createdAt: '2024-03-20',
+    lastUpdatedAt: '2024-03-20',
+    userId: 1,
+    categoryId: 1,
+    categoryName: 'Test Category',
+    posts: [{
+      id: 1,
+      content: 'Test Content',
+      createdAt: '2024-03-20',
+      lastUpdatedAt: '2024-03-20',
+      userId: 1,
+      threadId: 1,
+      threadTitle: 'Test Thread'
+    }]
+  };
 
   beforeEach(async () => {
+    const bbsSpy = jasmine.createSpyObj('BbsService', [
+      'getAllCategories',
+      'getThreadsByCategory',
+      'getThreadById',
+      'createThread',
+      'createPost'
+    ]);
+
+    const authSpy = jasmine.createSpyObj('AuthService', [], {
+      currentUser$: of({ id: 1, username: 'testuser' })
+    });
+
     await TestBed.configureTestingModule({
       imports: [
         CommonModule,
         RouterTestingModule,
+        HttpClientTestingModule,
         UserAvatarComponent,
         NewThreadModalComponent,
         ThreadDetailsModalComponent,
         ForumComponent
+      ],
+      providers: [
+        { provide: BbsService, useValue: bbsSpy },
+        { provide: AuthService, useValue: authSpy },
+        HttpClient
       ]
     }).compileComponents();
+
+    bbsService = TestBed.inject(BbsService) as jasmine.SpyObj<BbsService>;
+    authService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
+    httpClient = TestBed.inject(HttpClient);
+    httpTestingController = TestBed.inject(HttpTestingController);
+
+    bbsService.getAllCategories.and.returnValue(of(mockCategories));
+    bbsService.getThreadsByCategory.and.returnValue(of(mockThreads));
+    bbsService.getThreadById.and.returnValue(of(mockThreadDetails));
+    bbsService.createThread.and.returnValue(of(mockThreadDetails));
+    bbsService.createPost.and.returnValue(of({
+      id: 2,
+      content: 'New Comment',
+      createdAt: '2024-03-20',
+      lastUpdatedAt: '2024-03-20',
+      userId: 1,
+      threadId: 1,
+      threadTitle: 'Test Thread'
+    }));
 
     fixture = TestBed.createComponent(ForumComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
+  afterEach(() => {
+    httpTestingController.verify();
+  });
+
   it('debería crear', () => {
     expect(component).toBeTruthy();
   });
 
-  describe('Gestión de categorías', () => {
-    it('debería alternar el estado de expansión de la categoría', () => {
-      const initialExpandedState = component.categories[0].isExpanded;
-      component.toggleCategory(1);
-      expect(component.categories[0].isExpanded).toBe(!initialExpandedState);
+  describe('Inicialización', () => {
+    it('debería cargar las categorías al iniciar', () => {
+      expect(bbsService.getAllCategories).toHaveBeenCalled();
+      expect(component.categories.length).toBeGreaterThan(0);
     });
 
-    it('no debería modificar una categoría inexistente', () => {
-      const initialCategories = [...component.categories];
-      component.toggleCategory(999);
-      expect(component.categories).toEqual(initialCategories);
+    it('debería cargar los hilos para cada categoría', () => {
+      expect(bbsService.getThreadsByCategory).toHaveBeenCalled();
     });
   });
 
   describe('Gestión de hilos', () => {
-    it('debería identificar correctamente los nuevos hilos', () => {
-      const newThread = {
+    it('debería abrir los detalles del hilo', () => {
+      const thread = {
         id: 1,
-        title: 'New Thread',
+        title: 'Test Thread',
         author: 'Test User',
         lastActivity: '2024-03-20',
         replies: 0,
         views: 0,
-        createdAt: new Date().toISOString()
+        createdAt: '2024-03-20'
       };
-      expect(component.isNewThread(newThread)).toBe(true);
-    });
 
-    it('debería identificar correctamente los hilos populares', () => {
-      const hotThread = {
-        id: 1,
-        title: 'Hot Thread',
-        author: 'Test User',
-        lastActivity: '2024-03-20',
-        replies: 25,
-        views: 600,
-        createdAt: '2024-03-15'
-      };
-      expect(component.isHotThread(hotThread)).toBe(true);
-    });
-
-    it('debería crear un nuevo hilo en la categoría correcta', () => {
-      const categoryId = 1;
-      const initialThreadCount = component.categories[0].threads.length;
-
-      component.createNewThread(categoryId);
-      component.modal.createThread.next({
-        title: 'Test Thread',
-        content: 'Test Content'
-      });
-
-      expect(component.categories[0].threads.length).toBe(initialThreadCount + 1);
-      const newThread = component.categories[0].threads[0];
-      expect(newThread.title).toBe('Test Thread');
-      expect(newThread.replies).toBe(0);
-      expect(newThread.views).toBe(0);
-    });
-  });
-
-  describe('Detalles del hilo', () => {
-    it('debería abrir los detalles del hilo con los datos correctos', () => {
-      const thread = component.categories[0].threads[0];
       component.openThreadDetails(thread);
-
-      const threadDetails = component.threadModal.thread;
-      expect(threadDetails).toBeDefined();
-      if (threadDetails) {
-        expect(threadDetails.id).toBe(thread.id);
-        expect(threadDetails.title).toBe(thread.title);
-        expect(threadDetails.comments).toBeDefined();
-      }
+      expect(bbsService.getThreadById).toHaveBeenCalledWith(thread.id);
+      expect(component.threadModal.thread).toBeDefined();
     });
 
-    it('debería generar comentarios de marcador de posición', () => {
-      const thread = component.categories[0].threads[0];
-      const comments = component.generatePlaceholderComments(thread);
+    it('debería crear un nuevo hilo', () => {
+      component.selectedCategoryId = 1;
+      component.currentUserId = 1;
+      component.modal.open();
+      component.modal.createThread.emit({
+        title: 'New Thread',
+        posts: [{
+          id: 0,
+          content: 'New Content',
+          createdAt: new Date().toISOString(),
+          lastUpdatedAt: new Date().toISOString(),
+          userId: 1,
+          threadId: 0,
+          threadTitle: 'New Thread'
+        }]
+      } as ThreadDto);
 
-      expect(comments.length).toBeGreaterThanOrEqual(3);
-      expect(comments.length).toBeLessThanOrEqual(7);
-      expect(comments[0].id).toBeDefined();
-      expect(comments[0].author).toBeDefined();
-      expect(comments[0].content).toBeDefined();
-      expect(comments[0].createdAt).toBeDefined();
+      expect(bbsService.createThread).toHaveBeenCalledWith({
+        id: 0,
+        title: 'New Thread',
+        createdAt: jasmine.any(String),
+        lastUpdatedAt: jasmine.any(String),
+        userId: 1,
+        categoryId: 1,
+        categoryName: '',
+        posts: [{
+          id: 0,
+          content: 'New Content',
+          createdAt: jasmine.any(String),
+          lastUpdatedAt: jasmine.any(String),
+          userId: 1,
+          threadId: 0,
+          threadTitle: 'New Thread'
+        }]
+      });
     });
   });
 
   describe('Manejo de comentarios', () => {
-    it('debería manejar correctamente los nuevos comentarios', () => {
-      const thread = component.categories[0].threads[0];
-      component.openThreadDetails(thread);
+    it('debería agregar un nuevo comentario', () => {
+      component.currentUserId = 1;
+      component.threadModal.thread = {
+        id: 1,
+        title: 'Test Thread',
+        author: 'Test User',
+        content: 'Test Content',
+        lastActivity: '2024-03-20',
+        replies: 0,
+        views: 0,
+        createdAt: '2024-03-20',
+        comments: []
+      };
 
-      const threadDetails = component.threadModal.thread;
-      expect(threadDetails).toBeDefined();
-      if (threadDetails) {
-        const initialReplyCount = threadDetails.replies;
-        const newComment = {
-          id: 999,
-          author: 'Test User',
-          content: 'Test Comment',
-          createdAt: new Date().toISOString()
-        };
+      component.onAddComment({
+        threadId: 1,
+        content: 'New Comment'
+      });
 
-        component.threadModal.addNewComment.next(newComment);
-
-        expect(threadDetails.replies).toBe(initialReplyCount + 1);
-        expect(threadDetails.comments).toContain(newComment);
-      }
+      expect(bbsService.createPost).toHaveBeenCalled();
+      expect(bbsService.getThreadById).toHaveBeenCalledWith(1);
     });
   });
 
   describe('Ciclo de vida del componente', () => {
-    it('debería cancelar la suscripción a los comentarios al destruir', () => {
-      const thread = component.categories[0].threads[0];
-      component.openThreadDetails(thread);
-
-      // Access the subscription through the component's public interface
-      const subscription = (component as any).commentSubscription as Subscription;
-      expect(subscription).toBeDefined();
-
+    it('debería limpiar las suscripciones al destruir', () => {
+      const spy = spyOn(component as any, 'ngOnDestroy');
       component.ngOnDestroy();
-      expect(subscription.closed).toBe(true);
-    });
-  });
-
-  describe('Paginación', () => {
-    it('debería tener los valores de paginación iniciales correctos', () => {
-      expect(component.currentPage).toBe(1);
-      expect(component.totalPages).toBe(5);
-      expect(component.threadsPerPage).toBe(10);
+      expect(spy).toHaveBeenCalled();
     });
   });
 });

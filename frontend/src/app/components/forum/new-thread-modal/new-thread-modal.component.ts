@@ -20,10 +20,10 @@ import { PostDto, ThreadDto } from '../../../services/bbs.service';
               <label for="title">Título</label>
               <input type="text" id="title" [(ngModel)]="threadTitle" name="title" required>
             </div>
-            <div class="form-group">
+            <!-- <div class="form-group">
               <label for="content">Contenido</label>
               <textarea id="content" [(ngModel)]="threadContent" name="content" required></textarea>
-            </div>
+            </div> -->
             <div class="form-actions">
               <button type="button" class="cancel-btn" (click)="close()">Cancelar</button>
               <button type="submit" class="submit-btn">Crear Tema</button>
@@ -142,7 +142,8 @@ export class NewThreadModalComponent {
   }
 
   submitThread() {
-    if (this.threadTitle && this.threadContent) {
+    // if (this.threadTitle && this.threadContent) {
+    if (this.threadTitle) {
       this.createThread.emit({
         title: this.threadTitle,
         posts: [

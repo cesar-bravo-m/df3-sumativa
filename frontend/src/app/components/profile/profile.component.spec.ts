@@ -4,8 +4,8 @@ import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
-import { AuthService } from '../../services/auth.service';
-import { BehaviorSubject } from 'rxjs';
+import { AuthService, JwtResponse } from '../../services/auth.service';
+import { BehaviorSubject, of } from 'rxjs';
 import { Validators } from '@angular/forms';
 
 describe('ProfileComponent', () => {
@@ -201,8 +201,8 @@ describe('ProfileComponent', () => {
 
   describe('Envío del formulario', () => {
     it('debería manejar la actualización exitosa del nombre de usuario', () => {
-      authService.login.and.returnValue(true);
-      authService.updateUsername.and.returnValue(true);
+      authService.login.and.returnValue(of({} as JwtResponse));
+      authService.updateUsername.and.returnValue(of(true));
 
       component.profileForm.patchValue({
         username: 'newusername',
@@ -217,8 +217,8 @@ describe('ProfileComponent', () => {
     });
 
     it('debería manejar la actualización exitosa de la contraseña', () => {
-      authService.login.and.returnValue(true);
-      authService.updatePassword.and.returnValue(true);
+      authService.login.and.returnValue(of({} as JwtResponse));
+      authService.updatePassword.and.returnValue(of(true));
 
       component.profileForm.patchValue({
         username: mockUser.username,
@@ -235,8 +235,8 @@ describe('ProfileComponent', () => {
     });
 
     it('debería manejar la actualización fallida del nombre de usuario', () => {
-      authService.login.and.returnValue(true);
-      authService.updateUsername.and.returnValue(false);
+      authService.login.and.returnValue(of({} as JwtResponse));
+      authService.updateUsername.and.returnValue(of(false));
 
       component.profileForm.patchValue({
         username: 'newusername',
@@ -250,8 +250,8 @@ describe('ProfileComponent', () => {
     });
 
     it('debería manejar la actualización fallida de la contraseña', () => {
-      authService.login.and.returnValue(true);
-      authService.updatePassword.and.returnValue(false);
+      authService.login.and.returnValue(of({} as JwtResponse));
+      authService.updatePassword.and.returnValue(of(false));
 
       component.profileForm.patchValue({
         username: mockUser.username,
@@ -280,8 +280,8 @@ describe('ProfileComponent', () => {
     });
 
     it('debería limpiar los campos del formulario después de una actualización exitosa de contraseña', () => {
-      authService.login.and.returnValue(true);
-      authService.updatePassword.and.returnValue(true);
+      authService.login.and.returnValue(of({} as JwtResponse));
+      authService.updatePassword.and.returnValue(of(true));
 
       component.profileForm.patchValue({
         username: mockUser.username,

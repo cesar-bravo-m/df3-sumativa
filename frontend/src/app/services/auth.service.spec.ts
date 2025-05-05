@@ -1,133 +1,125 @@
 import { TestBed } from '@angular/core/testing';
-import { AuthService } from './auth.service';
-import { BehaviorSubject } from 'rxjs';
+import { AuthService, JwtResponse, User } from './auth.service';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 
 describe('AuthService', () => {
   let service: AuthService;
-  let currentUserSubject: BehaviorSubject<any>;
-
-  const mockUser = {
-    id: 1,
-    username: 'testuser',
-    password: 'testpass',
-    email: 'test@example.com',
-    moderator: false,
-    roles: ['NORMAL_POSTER']
-  };
-
-  const mockUsers = [mockUser];
+  let httpClient: HttpClient;
+  let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
-    (AuthService as any).storedUsers = mockUsers;
     TestBed.configureTestingModule({
-      providers: [AuthService]
+      imports: [HttpClientTestingModule],
+      providers: [
+        AuthService,
+        HttpClient
+      ]
     });
 
     service = TestBed.inject(AuthService);
-    currentUserSubject = (service as any).currentUserSubject;
+    httpClient = TestBed.inject(HttpClient);
+    httpTestingController = TestBed.inject(HttpTestingController);
+  });
+
+  afterEach(() => {
+    httpTestingController.verify();
   });
 
   it('debería ser creado', () => {
     expect(service).toBeTruthy();
   });
 
-  describe('Inicialización', () => {
-    it('debería inicializarse sin usuario actual', () => {
-      expect(service.isLoggedIn()).toBeFalse();
-      expect(currentUserSubject.value).toBeNull();
+  it('debería hacer login correctamente', () => {
+    const mockResponse: JwtResponse = {
+      accessToken: 'test-token',
+      type: 'Bearer',
+      id: 1,
+      username: 'testuser',
+      email: 'test@example.com',
+      role: 'NORMAL_POSTER',
+      roles: ['NORMAL_POSTER']
+    };
+
+    service.login('test@example.com', 'password').subscribe(response => {
+      expect(response).toEqual(mockResponse);
     });
 
+    const req = httpTestingController.expectOne(`${environment.authApiUrl}/api/auth/signin`);
+    expect(req.request.method).toBe('POST');
+    req.flush(mockResponse);
   });
 
-  describe('Inicio de sesión', () => {
-    it('debería iniciar sesión exitosamente con credenciales correctas', () => {
-      (service as any).users = [mockUser];
-      const result = service.login(mockUser.email, mockUser.password);
+  it('debería manejar errores de login', () => {
+    service.login('test@example.com', 'wrong-password').subscribe({
+      error: (error) => {
+        expect(error.status).toBe(401);
+      }
+    });
+
+    const req = httpTestingController.expectOne(`${environment.authApiUrl}/api/auth/signin`);
+    req.flush('Unauthorized', { status: 401, statusText: 'Unauthorized' });
+  });
+
+  it('debería obtener el usuario actual', () => {
+    const mockUser: User = {
+      id: 1,
+      username: 'testuser',
+      email: 'test@example.com',
+      role: 'NORMAL_POSTER',
+      roles: ['NORMAL_POSTER']
+    };
+
+    service.getUserFromEmail('test@example.com').subscribe(user => {
+      expect(user).toEqual(mockUser);
+    });
+
+    const req = httpTestingController.expectOne(`${environment.authApiUrl}/api/users/email/test@example.com`);
+    expect(req.request.method).toBe('GET');
+    req.flush(mockUser);
+  });
+
+  it('debería actualizar la contraseña', () => {
+    service.updatePassword('test@example.com', 'new-password').subscribe(result => {
       expect(result).toBeTrue();
     });
 
-    it('debería fallar el inicio de sesión con credenciales incorrectas', () => {
-      const result = service.login('wrong@email.com', 'wrongpass');
-      expect(result).toBeFalse();
-      expect(service.isLoggedIn()).toBeFalse();
-      expect(currentUserSubject.value).toBeNull();
-    });
+    const req = httpTestingController.expectOne(req =>
+      req.url.includes('/api/users/') && req.method === 'PUT'
+    );
+    req.flush(true);
   });
 
-  describe('Registro', () => {
-    it('debería registrar un nuevo usuario exitosamente', () => {
-      const newUser = {
-        username: 'newuser',
-        password: 'newpass',
-        email: 'new@example.com'
-      };
-
-      const result = service.register(newUser.username, newUser.password, newUser.email);
+  it('debería actualizar el nombre de usuario', () => {
+    service.updateUsername('test@example.com', 'new-username').subscribe(result => {
       expect(result).toBeTrue();
     });
 
-    it('debería fallar el registro con un email existente', () => {
-      (service as any).users = [mockUser];
-      const result = service.register('newuser', 'newpass', mockUser.email);
-      expect(result).toBeFalse();
-    });
+    const req = httpTestingController.expectOne(req =>
+      req.url.includes('/api/users/') && req.method === 'PUT'
+    );
+    req.flush(true);
   });
 
-  describe('Recuperación de contraseña', () => {
-    it('debería devolver el código de verificación para un email existente', () => {
-      (service as any).users = [mockUser];
-      service.recoverPassword(mockUser.email).subscribe((code) => {
-        expect(code).toBe('000');
-      });
-    });
-
-    it('debería devolver una cadena vacía para un email inexistente', () => {
-      service.recoverPassword('nonexistent@example.com').subscribe((code) => {
-        expect(code).not.toBe('000');
-      });
-    });
-  });
-
-  describe('Actualización de contraseña', () => {
-    beforeEach(() => {
-      service.login(mockUser.email, mockUser.password);
-    });
-
-    it('debería fallar la actualización de contraseña para un email inexistente', () => {
-      const result = service.updatePassword('nonexistent@example.com', 'newpass');
-      expect(result).toBeFalse();
-    });
-  });
-
-  describe('Actualización de nombre de usuario', () => {
-    beforeEach(() => {
-      service.login(mockUser.email, mockUser.password);
-    });
-
-    it('debería actualizar el nombre de usuario exitosamente', () => {
-      (service as any).users = [mockUser];
-      const newUsername = 'newusername';
-      const result = service.updateUsername(mockUser.email, newUsername);
+  it('debería actualizar el email', () => {
+    service.updateEmail(1, 'new@example.com').subscribe(result => {
       expect(result).toBeTrue();
-      const updatedUser = { ...mockUser, username: newUsername };
     });
 
-    it('debería fallar la actualización de nombre de usuario para un email inexistente', () => {
-      const result = service.updateUsername('nonexistent@example.com', 'newusername');
-      (service as any).users = [mockUser];
-      expect(result).toBeFalse();
-    });
+    const req = httpTestingController.expectOne(`${environment.authApiUrl}/api/users/1`);
+    expect(req.request.method).toBe('PUT');
+    req.flush(true);
   });
 
-  describe('Cierre de sesión', () => {
-    beforeEach(() => {
-      service.login(mockUser.email, mockUser.password);
+  it('debería recuperar la contraseña', () => {
+    service.recoverPassword('test@example.com').subscribe(code => {
+      expect(code).toBe('000');
     });
 
-    it('debería cerrar sesión exitosamente', () => {
-      service.logout();
-      expect(service.isLoggedIn()).toBeFalse();
-      expect(currentUserSubject.value).toBeNull();
-    });
+    const req = httpTestingController.expectOne(req =>
+      req.url.includes('/api/users/email/') && req.method === 'GET'
+    );
+    req.flush({ id: 1 });
   });
 });

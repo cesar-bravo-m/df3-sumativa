@@ -2,6 +2,10 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ThreadDetailsModalComponent } from './thread-details-modal.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpClient } from '@angular/common/http';
+import { AuthService } from '../../../services/auth.service';
+import { of } from 'rxjs';
 
 interface Comment {
   id: number;
@@ -47,14 +51,28 @@ describe('ThreadDetailsModalComponent', () => {
   };
 
   beforeEach(async () => {
+    const authSpy = jasmine.createSpyObj('AuthService', [], {
+      currentUser$: of({ id: 1, username: 'testuser' })
+    });
+
     await TestBed.configureTestingModule({
-      imports: [CommonModule, FormsModule],
-      // declarations: [ThreadDetailsModalComponent]
+      imports: [
+        CommonModule,
+        FormsModule,
+        HttpClientTestingModule
+      ],
+      declarations: [ThreadDetailsModalComponent],
+      providers: [
+        HttpClient,
+        { provide: AuthService, useValue: authSpy }
+      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(ThreadDetailsModalComponent);
     component = fixture.componentInstance;
     component.thread = mockThread;
+    component.currentUserId = 1;
+    component.currentUsername = 'Test User';
     fixture.detectChanges();
   });
 
@@ -103,32 +121,45 @@ describe('ThreadDetailsModalComponent', () => {
   });
 
   describe('Gestión de comentarios', () => {
-    it('debería agregar un nuevo comentario y emitir el evento addNewComment', () => {
+    it('debería emitir el evento addNewComment con los datos correctos', () => {
       spyOn(component.addNewComment, 'emit');
       component.newComment = 'New Test Comment';
       component.addComment();
       expect(component.addNewComment.emit).toHaveBeenCalledWith({
-        id: mockThread.comments.length + 1,
-        author: 'Usuario Actual',
-        content: 'New Test Comment',
-        createdAt: jasmine.any(String)
+        threadId: mockThread.id,
+        content: 'New Test Comment'
       });
       expect(component.newComment).toBe('');
     });
 
-    it('no debería agregar un comentario vacío', () => {
+    it('no debería emitir el evento addNewComment si el comentario está vacío', () => {
       spyOn(component.addNewComment, 'emit');
       component.newComment = '   ';
       component.addComment();
       expect(component.addNewComment.emit).not.toHaveBeenCalled();
     });
 
-    it('no debería agregar un comentario si el hilo no está definido', () => {
+    it('no debería emitir el evento addNewComment si el hilo no está definido', () => {
       spyOn(component.addNewComment, 'emit');
       component.thread = undefined;
       component.newComment = 'New Test Comment';
       component.addComment();
       expect(component.addNewComment.emit).not.toHaveBeenCalled();
+    });
+
+    it('debería mostrar el estado de carga durante la creación del comentario', () => {
+      component.isSubmitting = true;
+      fixture.detectChanges();
+      const submitButton = fixture.nativeElement.querySelector('.submit-btn');
+      expect(submitButton.disabled).toBeTrue();
+      expect(submitButton.textContent).toContain('Publicando...');
+    });
+
+    it('debería mostrar mensajes de error', () => {
+      component.error = 'Error de prueba';
+      fixture.detectChanges();
+      const errorMessage = fixture.nativeElement.querySelector('.error-message');
+      expect(errorMessage.textContent).toContain('Error de prueba');
     });
   });
 

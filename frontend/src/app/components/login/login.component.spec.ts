@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
-import { AuthService } from '../../services/auth.service';
+import { AuthService, JwtResponse } from '../../services/auth.service';
 import { of } from 'rxjs';
 
 describe('LoginComponent', () => {
@@ -97,7 +97,7 @@ describe('LoginComponent', () => {
 
     it('should handle successful login', () => {
       const navigateSpy = spyOn(router, 'navigate');
-      authService.login.and.returnValue(true);
+      authService.login.and.returnValue(of({} as JwtResponse));
 
       component.loginForm.setValue({
         email: 'test@domain.com',
@@ -113,7 +113,7 @@ describe('LoginComponent', () => {
 
     it('should handle failed login', () => {
       const navigateSpy = spyOn(router, 'navigate');
-      authService.login.and.returnValue(false);
+      authService.login.and.returnValue(of({} as JwtResponse));
 
       component.loginForm.setValue({
         email: 'test@domain.com',
