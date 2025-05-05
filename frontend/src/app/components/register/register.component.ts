@@ -103,7 +103,15 @@ export class RegisterComponent {
     if (this.registerForm.valid) {
       const { username, email, password } = this.registerForm.value;
       if (this.authService.register(username, password, email)) {
-        this.router.navigate(['/login']);
+        // this.router.navigate(['/login']);
+        this.authService.login(email, password).subscribe({
+          next: (response) => {
+            console.log("### login success", response);
+            this.router.navigate(['/forum']);
+          },
+          error: (error) => {
+          }
+        });
       } else {
         this.errorMessage = 'El nombre de usuario ya existe';
       }
@@ -161,7 +169,6 @@ export class RegisterComponent {
     const errors: string[] = [];
     const emailControl = this.registerForm.get('email');
 
-    debugger
     if (emailControl?.errors) {
       if (emailControl.errors['required']) {
         errors.push('El correo electrónico es requerido');
@@ -175,13 +182,62 @@ export class RegisterComponent {
       if (emailControl.errors['noTld']) {
         errors.push('El correo electrónico debe incluir un dominio con TLD (ej: .com, .cl, .net)');
       }
-      debugger
       if (emailControl.errors['invalidTld']) {
-        debugger
         errors.push('Solo se permiten dominios .com, .cl o .net');
       }
     }
 
     return errors;
+  }
+
+  hasUsernameMinLength(): boolean {
+    const username = this.registerForm.get('username')?.value || '';
+    return username.length >= 3;
+  }
+
+  hasUsernameMaxLength(): boolean {
+    const username = this.registerForm.get('username')?.value || '';
+    return username.length <= 12;
+  }
+
+  hasValidUsernameChars(): boolean {
+    const username = this.registerForm.get('username')?.value || '';
+    return /^[a-zA-Z0-9]+$/.test(username);
+  }
+
+  hasValidEmailFormat(): boolean {
+    const email = this.registerForm.get('email')?.value || '';
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  hasValidTld(): boolean {
+    const email = this.registerForm.get('email')?.value || '';
+    const tld = email.split('.').pop()?.toLowerCase();
+    return ['com', 'cl', 'net'].includes(tld || '');
+  }
+
+  hasMinLength(): boolean {
+    const password = this.registerForm.get('password')?.value || '';
+    return password.length >= 8;
+  }
+
+  hasMaxLength(): boolean {
+    const password = this.registerForm.get('password')?.value || '';
+    return password.length <= 32;
+  }
+
+  hasLetter(): boolean {
+    const password = this.registerForm.get('password')?.value || '';
+    return /[A-Za-z]/.test(password);
+  }
+
+  hasNumber(): boolean {
+    const password = this.registerForm.get('password')?.value || '';
+    return /[0-9]/.test(password);
+  }
+
+  hasSpecialChar(): boolean {
+    const password = this.registerForm.get('password')?.value || '';
+    return /[!@#$%^&*(),.?":{}|<>]/.test(password);
   }
 }

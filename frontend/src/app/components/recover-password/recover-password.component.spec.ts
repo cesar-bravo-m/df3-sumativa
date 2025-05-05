@@ -68,18 +68,18 @@ describe('RecoverPasswordComponent', () => {
       authService.recoverPassword.and.returnValue('123456');
       component.recoverForm.get('username')?.setValue('testuser');
 
-      component.onSubmitUsername();
+      component.onSubmitEmail();
 
-      expect(authService.recoverPassword).toHaveBeenCalledWith('testuser');
+      expect(authService.recoverPassword).toHaveBeenCalledWith('testuser@example.com');
       expect(component.currentStep).toBe('verification');
-      expect(component.username).toBe('testuser');
+      expect(component.email).toBe('testuser@example.com');
     });
   });
 
   describe('Paso de verificación', () => {
     beforeEach(() => {
       component.currentStep = 'verification';
-      component.username = 'testuser';
+      component.email = 'testuser@example.com';
     });
 
     it('debería requerir código de verificación', () => {
@@ -106,7 +106,7 @@ describe('RecoverPasswordComponent', () => {
   describe('Paso de nueva contraseña', () => {
     beforeEach(() => {
       component.currentStep = 'newPassword';
-      component.username = 'testuser';
+      component.email = 'testuser@example.com';
     });
 
     it('debería validar los requisitos de la contraseña', () => {

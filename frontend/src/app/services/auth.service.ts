@@ -122,7 +122,7 @@ export class AuthService {
     );
   }
 
-  recoverPassword(username: string): string {
+  recoverPassword(email: string): Observable<string> {
     // this.http.post(`${this.API_URL}/api/auth/recover/${username}`, {}).subscribe((response: any) => {
     //   console.log("### response", response);
     //   if (response && response.message === "Password recovered successfully!") {
@@ -130,7 +130,11 @@ export class AuthService {
     //   }
     // });
     // return false;
-    return '000'
+    return this.getUserFromEmail(email).pipe(
+      map((user: User) => {
+        return '000';
+      })
+    );
   }
 
   logout(): void {

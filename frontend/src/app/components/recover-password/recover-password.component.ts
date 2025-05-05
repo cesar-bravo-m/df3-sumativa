@@ -16,9 +16,9 @@ export class RecoverPasswordComponent {
   recoverForm: FormGroup;
   verificationForm: FormGroup;
   newPasswordForm: FormGroup;
-  currentStep: 'username' | 'verification' | 'newPassword' = 'username';
+  currentStep: 'email' | 'verification' | 'newPassword' = 'email';
   errorMessage: string = '';
-  username: string = '';
+  email: string = '';
 
   constructor(
     private fb: FormBuilder,
@@ -26,7 +26,7 @@ export class RecoverPasswordComponent {
     private router: Router
   ) {
     this.recoverForm = this.fb.group({
-      username: ['', [Validators.required]]
+      email: ['', [Validators.required]]
     });
 
     this.verificationForm = this.fb.group({
@@ -45,32 +45,47 @@ export class RecoverPasswordComponent {
       : { mismatch: true };
   }
 
-  onSubmitUsername(): void {
+  onSubmitEmail(): void {
     if (this.recoverForm.valid) {
-      this.username = this.recoverForm.get('username')?.value;
-      const code = this.authService.recoverPassword(this.username);
-      if (code) {
-        this.currentStep = 'verification';
-      } else {
-        this.errorMessage = 'Nombre de usuario no encontrado';
-      }
+      this.email = this.recoverForm.get('email')?.value;
+      this.authService.recoverPassword(this.email).subscribe({
+        next: (code) => {
+          if (code) {
+            this.currentStep = 'verification';
+          } else {
+            this.errorMessage = 'Correo electrónico no encontrado';
+          }
+        },
+        error: (error) => {
+          this.errorMessage = 'Correo electrónico no encontrado';
+        }
+      });
     }
   }
 
   onSubmitVerification(): void {
     if (this.verificationForm.valid) {
       this.currentStep = 'newPassword';
+      this.errorMessage = '';
     }
   }
 
   onSubmitNewPassword(): void {
     if (this.newPasswordForm.valid) {
       const { password } = this.newPasswordForm.value;
-      if (this.authService.updatePassword(this.username, password)) {
-        this.router.navigate(['/login']);
-      } else {
-        this.errorMessage = 'Error al actualizar la contraseña';
-      }
+      this.authService.updatePassword(this.email, password).subscribe({
+        next: (response) => {
+          this.router.navigate(['/login']);
+        },
+        error: (error) => {
+          this.errorMessage = 'Error al actualizar la contraseña';
+        }
+      });
+      // if (this.authService.updatePassword(this.username, password)) {
+      //   this.router.navigate(['/login']);
+      // } else {
+      //   this.errorMessage = 'Error al actualizar la contraseña';
+      // }
     }
   }
 

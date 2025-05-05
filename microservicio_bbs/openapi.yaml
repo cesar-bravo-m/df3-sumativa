@@ -1,0 +1,726 @@
+openapi: 3.0.0
+info:
+  title: SumativaPosts API
+  description: API for managing forum posts, threads, and categories
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@example.com
+
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token for authentication
+
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          description: HTTP status code
+        message:
+          type: string
+          description: Error message
+
+    ValidationError:
+      type: object
+      additionalProperties:
+        type: string
+        description: Field name and error message
+
+    CategoryDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Category ID
+        name:
+          type: string
+          description: Category name
+        description:
+          type: string
+          description: Category description
+        threads:
+          type: array
+          items:
+            $ref: '#/components/schemas/ThreadSummaryDto'
+          description: List of threads in this category
+
+    ThreadSummaryDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Thread ID
+        title:
+          type: string
+          description: Thread title
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        lastUpdatedAt:
+          type: string
+          format: date-time
+          description: Last update timestamp
+        userId:
+          type: integer
+          description: User ID who created the thread
+        categoryId:
+          type: integer
+          format: int64
+          description: Category ID
+        postCount:
+          type: integer
+          description: Number of posts in the thread
+
+    ThreadDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Thread ID
+        title:
+          type: string
+          description: Thread title
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        lastUpdatedAt:
+          type: string
+          format: date-time
+          description: Last update timestamp
+        userId:
+          type: integer
+          description: User ID who created the thread
+        categoryId:
+          type: integer
+          format: int64
+          description: Category ID
+        categoryName:
+          type: string
+          description: Category name
+        posts:
+          type: array
+          items:
+            $ref: '#/components/schemas/PostDto'
+          description: List of posts in the thread
+
+    PostDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Post ID
+        content:
+          type: string
+          description: Post content
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        lastUpdatedAt:
+          type: string
+          format: date-time
+          description: Last update timestamp
+        userId:
+          type: integer
+          description: User ID who created the post
+        threadId:
+          type: integer
+          format: int64
+          description: Thread ID
+        threadTitle:
+          type: string
+          description: Thread title
+
+    JwtRequest:
+      type: object
+      properties:
+        token:
+          type: string
+          description: JWT token to decode
+
+paths:
+  /api/categories:
+    get:
+      summary: Get all categories
+      description: Retrieve a list of all categories
+      responses:
+        '200':
+          description: List of categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CategoryDto'
+    post:
+      summary: Create a new category
+      description: Create a new category (moderator only)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryDto'
+      responses:
+        '201':
+          description: Category created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryDto'
+        '403':
+          description: Unauthorized - Only moderators can create categories
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/categories/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+    get:
+      summary: Get category by ID
+      description: Retrieve a category by its ID
+      responses:
+        '200':
+          description: Category details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryDto'
+        '404':
+          description: Category not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      summary: Update category
+      description: Update an existing category (moderator only)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryDto'
+      responses:
+        '200':
+          description: Category updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryDto'
+        '403':
+          description: Unauthorized - Only moderators can update categories
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Category not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      summary: Delete category
+      description: Delete a category (moderator only)
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Category deleted successfully
+        '403':
+          description: Unauthorized - Only moderators can delete categories
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Category not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/threads:
+    get:
+      summary: Get all threads
+      description: Retrieve a list of all threads in summary form
+      responses:
+        '200':
+          description: List of threads
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ThreadSummaryDto'
+    post:
+      summary: Create a new thread
+      description: Create a new thread (authenticated users only)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ThreadDto'
+      responses:
+        '201':
+          description: Thread created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreadDto'
+        '401':
+          description: Unauthorized - Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/threads/category/{categoryId}:
+    parameters:
+      - name: categoryId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+    get:
+      summary: Get threads by category
+      description: Retrieve all threads in a specific category
+      responses:
+        '200':
+          description: List of threads in the category
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ThreadSummaryDto'
+        '404':
+          description: Category not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/threads/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+    get:
+      summary: Get thread by ID
+      description: Retrieve a thread by its ID, including all posts
+      responses:
+        '200':
+          description: Thread details with posts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreadDto'
+        '404':
+          description: Thread not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      summary: Update thread
+      description: Update an existing thread (owner or moderator only)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ThreadDto'
+      responses:
+        '200':
+          description: Thread updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreadDto'
+        '403':
+          description: Unauthorized - You can only update your own threads
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Thread not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      summary: Delete thread
+      description: Delete a thread (owner or moderator only)
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Thread deleted successfully
+        '403':
+          description: Unauthorized - You can only delete your own threads
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Thread not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/threads/search:
+    get:
+      summary: Search threads
+      description: Search threads by title
+      parameters:
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of matching threads
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ThreadSummaryDto'
+
+  /api/posts:
+    get:
+      summary: Get all posts
+      description: Retrieve a list of all posts
+      responses:
+        '200':
+          description: List of posts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PostDto'
+    post:
+      summary: Create a new post
+      description: Create a new post (authenticated users only)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostDto'
+      responses:
+        '201':
+          description: Post created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostDto'
+        '401':
+          description: Unauthorized - Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/posts/thread/{threadId}:
+    parameters:
+      - name: threadId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+    get:
+      summary: Get posts by thread
+      description: Retrieve all posts in a specific thread
+      responses:
+        '200':
+          description: List of posts in the thread
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PostDto'
+        '404':
+          description: Thread not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/posts/user/{userId}:
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      summary: Get posts by user
+      description: Retrieve all posts by a specific user
+      responses:
+        '200':
+          description: List of posts by the user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PostDto'
+
+  /api/posts/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+    get:
+      summary: Get post by ID
+      description: Retrieve a post by its ID
+      responses:
+        '200':
+          description: Post details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostDto'
+        '404':
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      summary: Update post
+      description: Update an existing post (owner or moderator only)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostDto'
+      responses:
+        '200':
+          description: Post updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostDto'
+        '403':
+          description: Unauthorized - You can only update your own posts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      summary: Delete post
+      description: Delete a post (owner or moderator only)
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Post deleted successfully
+        '403':
+          description: Unauthorized - You can only delete your own posts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/posts/search:
+    get:
+      summary: Search posts
+      description: Search posts by content
+      parameters:
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of matching posts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PostDto'
+
+  /api/jwt/decode:
+    get:
+      summary: Decode JWT token (GET)
+      description: Decode a JWT token using GET method
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Token claims
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '400':
+          description: Invalid token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      summary: Decode JWT token (POST)
+      description: Decode a JWT token using POST method
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JwtRequest'
+      responses:
+        '200':
+          description: Token claims
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '400':
+          description: Invalid token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/jwt/generate:
+    get:
+      summary: Generate sample token
+      description: Generate a sample JWT token
+      parameters:
+        - name: username
+          in: query
+          required: false
+          schema:
+            type: string
+            default: testuser
+      responses:
+        '200':
+          description: Generated token
+          content:
+            application/json:
+              schema:
+                type: string
+
+  /api/jwt/generate/normal-user:
+    get:
+      summary: Generate normal user token
+      description: Generate a JWT token for a normal user
+      parameters:
+        - name: username
+          in: query
+          required: false
+          schema:
+            type: string
+            default: normaluser
+        - name: userId
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+      responses:
+        '200':
+          description: Generated token
+          content:
+            application/json:
+              schema:
+                type: string
+
+  /api/jwt/generate/moderator:
+    get:
+      summary: Generate moderator token
+      description: Generate a JWT token for a moderator
+      parameters:
+        - name: username
+          in: query
+          required: false
+          schema:
+            type: string
+            default: moderator
+        - name: userId
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 2
+      responses:
+        '200':
+          description: Generated token
+          content:
+            application/json:
+              schema:
+                type: string 

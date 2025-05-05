@@ -8,7 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,7 +22,6 @@ import com.example.sumativa.repository.UserRepository;
 
 import jakarta.validation.Valid;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -54,8 +52,23 @@ public class UserController {
         }
     }
 
+    @GetMapping("/email/{email}")
+    public ResponseEntity<?> getUserByEmail(@PathVariable("email") String email) {
+        Optional<User> userData = userRepository.findByEmail(email);
+        System.out.println("email: " + email);
+        System.out.println("userData: " + userData);
+
+        if (userData.isPresent()) {
+            User user = userData.get();
+            user.setPassword("");
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('MODERATOR') or authentication.principal.id == #id")
+    // @PreAuthorize("hasRole('MODERATOR') or authentication.principal.id == #id")
     public ResponseEntity<?> updateUser(@PathVariable("id") long id, @Valid @RequestBody User user) {
         Optional<User> userData = userRepository.findById(id);
 
@@ -78,7 +91,7 @@ public class UserController {
                 existingUser.setEmail(user.getEmail());
             }
             
-            if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+            if (user.getPassword() != null && !user.getPassword().isEmpty() && !user.getPassword().equals("null")) {
                 existingUser.setPassword(encoder.encode(user.getPassword()));
             }
             

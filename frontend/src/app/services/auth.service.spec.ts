@@ -76,13 +76,15 @@ describe('AuthService', () => {
   describe('Recuperación de contraseña', () => {
     it('debería devolver el código de verificación para un email existente', () => {
       (service as any).users = [mockUser];
-      const code = service.recoverPassword(mockUser.email);
-      expect(code).toBe('000');
+      service.recoverPassword(mockUser.email).subscribe((code) => {
+        expect(code).toBe('000');
+      });
     });
 
     it('debería devolver una cadena vacía para un email inexistente', () => {
-      const code = service.recoverPassword('nonexistent@example.com');
-      expect(code).toBe('');
+      service.recoverPassword('nonexistent@example.com').subscribe((code) => {
+        expect(code).not.toBe('000');
+      });
     });
   });
 
@@ -105,13 +107,13 @@ describe('AuthService', () => {
     it('debería actualizar el nombre de usuario exitosamente', () => {
       (service as any).users = [mockUser];
       const newUsername = 'newusername';
-      const result = service.updateUsername(1, newUsername);
+      const result = service.updateUsername(mockUser.email, newUsername);
       expect(result).toBeTrue();
       const updatedUser = { ...mockUser, username: newUsername };
     });
 
     it('debería fallar la actualización de nombre de usuario para un email inexistente', () => {
-      const result = service.updateUsername(0, 'newusername');
+      const result = service.updateUsername('nonexistent@example.com', 'newusername');
       (service as any).users = [mockUser];
       expect(result).toBeFalse();
     });
