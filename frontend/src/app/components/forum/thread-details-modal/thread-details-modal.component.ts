@@ -239,8 +239,6 @@ export class ThreadDetailsModalComponent implements OnChanges {
   }
 
   addComment() {
-    console.log("### this.thread", this.thread);
-    console.log("### this.newComment", this.newComment);
     if (!this.newComment.trim() || !this.thread) {
       this.error = 'Por favor, escribe un comentario.';
       return;

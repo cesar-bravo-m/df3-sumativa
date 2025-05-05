@@ -123,11 +123,9 @@ export class LoginComponent {
 
       this.authService.login(email, password).subscribe({
         next: (response) => {
-          console.log("### login success", response);
           this.router.navigate(['/forum']);
         },
         error: (error) => {
-          console.log("### login FAILURE", error);
           this.errorMessage = 'Correo electrónico o contraseña inválidos';
           this.isLoading = false;
         }

@@ -52,7 +52,6 @@ export class AuthService {
   }
 
   login(email: string, password: string): Observable<JwtResponse> {
-    console.log("### SERVICE login with email", email, "and password", password);
     return this.http.post<JwtResponse>(`${this.API_URL}/api/auth/signin`, { email, password })
       .pipe(
         tap(response => {
@@ -65,7 +64,6 @@ export class AuthService {
             roles: response.roles,
             token: response.accessToken
           };
-          console.log("### response", response);
           this.currentUserSubject.next(user);
           localStorage.setItem('currentUser', JSON.stringify(user));
           localStorage.setItem('token', response.accessToken);
@@ -81,7 +79,6 @@ export class AuthService {
       role: 'NORMAL_POSTER'
     };
     this.http.post(`${this.API_URL}/api/auth/signup`, signupRequest).subscribe((response: any) => {
-      console.log("### response", response);
       if (response && response.message === "User registered successfully!") {
         return true;
       }
@@ -91,9 +88,7 @@ export class AuthService {
   }
 
   getUserFromEmail(email: string): Observable<User> {
-    console.log("### getUserIdFrom Email ", email);
     const token = this.getToken();
-    console.log("### getUserIdFrom Email - Token:", token);
     const response = this.http.get(`${this.API_URL}/api/users/email/${email}`, {
       headers: {
         Authorization: `Bearer ${token}`
@@ -101,16 +96,13 @@ export class AuthService {
     }).pipe(
       map((response: any) => response)
     );
-    console.log("### getUserIdFrom Email - Response:", response);
     return response;
   }
 
   updatePassword(email: string, password: string): Observable<boolean> {
-    console.log("### updatePassword - Starting password update for email:", email);
     return this.getUserFromEmail(email).pipe(
       tap(user => console.log("### updatePassword - Got user:", user)),
       switchMap((user: User) => {
-        console.log("### updatePassword - Making update request with token:", this.getToken());
         return this.http.put<boolean>(`${this.API_URL}/api/users/${user.id}`,
           {
             username: user.username,
@@ -123,13 +115,6 @@ export class AuthService {
   }
 
   recoverPassword(email: string): Observable<string> {
-    // this.http.post(`${this.API_URL}/api/auth/recover/${username}`, {}).subscribe((response: any) => {
-    //   console.log("### response", response);
-    //   if (response && response.message === "Password recovered successfully!") {
-    //     return true;
-    //   }
-    // });
-    // return false;
     return this.getUserFromEmail(email).pipe(
       map((user: User) => {
         return '000';
@@ -160,7 +145,6 @@ export class AuthService {
   }
 
   updateUsername(email: string, newUsername: string): Observable<any> {
-    console.log("### updateUsername - Starting username update for email:", email);
     return this.getUserFromEmail(email).pipe(
       tap(user => console.log("### updateUsername - Got user:", user)),
       switchMap((user: User) => this.http.put<boolean>(`${this.API_URL}/api/users/${user.id}`,

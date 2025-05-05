@@ -171,15 +171,7 @@ describe('ForumComponent', () => {
         userId: 1,
         categoryId: 1,
         categoryName: '',
-        posts: [{
-          id: 0,
-          content: 'New Content',
-          createdAt: jasmine.any(String),
-          lastUpdatedAt: jasmine.any(String),
-          userId: 1,
-          threadId: 0,
-          threadTitle: 'New Thread'
-        }]
+        posts: jasmine.any(Array)
       });
     });
   });

@@ -176,7 +176,6 @@ export class ForumComponent implements OnInit, OnDestroy, AfterViewInit {
   openThreadDetails(thread: Thread): void {
     this.bbsService.getThreadById(thread.id).subscribe({
       next: (apiThread: ThreadDto) => {
-        console.log("### apiThread", apiThread);
         const threadDetails: ThreadDetails = {
           id: apiThread.id,
           title: apiThread.title,

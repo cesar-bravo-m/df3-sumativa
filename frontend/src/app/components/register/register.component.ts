@@ -106,7 +106,6 @@ export class RegisterComponent {
         // this.router.navigate(['/login']);
         this.authService.login(email, password).subscribe({
           next: (response) => {
-            console.log("### login success", response);
             this.router.navigate(['/forum']);
           },
           error: (error) => {
@@ -155,7 +154,7 @@ export class RegisterComponent {
         errors.push('El nombre de usuario debe tener al menos 3 caracteres');
       }
       if (usernameControl.errors['maxlength']) {
-        errors.push('El nombre de usuario no debe exceder 12 caracteres');
+        errors.push('El nombre de usuario no debe exceder 32 caracteres');
       }
       if (usernameControl.errors['pattern']) {
         errors.push('El nombre de usuario no puede contener caracteres especiales');

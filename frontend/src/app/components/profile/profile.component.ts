@@ -149,7 +149,6 @@ export class ProfileComponent implements OnInit {
     return errors;
   }
 
-  // Individual password validation checks
   hasMinLength(): boolean {
     const password = this.profileForm.get('newPassword')?.value || '';
     return password.length >= 8;
@@ -203,7 +202,7 @@ export class ProfileComponent implements OnInit {
         errors.push('El nombre de usuario debe tener al menos 3 caracteres');
       }
       if (usernameControl.errors['maxlength']) {
-        errors.push('El nombre de usuario no debe exceder 12 caracteres');
+        errors.push('El nombre de usuario no debe exceder 32 caracteres');
       }
       if (usernameControl.errors['pattern']) {
         errors.push('El nombre de usuario no puede contener caracteres especiales');
