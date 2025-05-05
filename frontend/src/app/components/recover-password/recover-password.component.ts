@@ -114,7 +114,6 @@ export class RecoverPasswordComponent {
     return errors;
   }
 
-  // Individual password validation checks
   hasMinLength(): boolean {
     const password = this.newPasswordForm.get('password')?.value || '';
     return password.length >= 8;

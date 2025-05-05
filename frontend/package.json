@@ -8,7 +8,6 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:coverage": "ng test --code-coverage --browsers=ChromeHeadless --watch=false --source-map=true",
-    "test:coverage:ci": "ng test --code-coverage --browsers=ChromeHeadless --watch=false --source-map=true",
     "sonar": "sonar-scanner"
   },
   "private": true,

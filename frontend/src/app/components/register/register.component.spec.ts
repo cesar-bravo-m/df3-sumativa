@@ -238,4 +238,110 @@ describe('RegisterComponent', () => {
       expect(authService.register).not.toHaveBeenCalled();
     });
   });
+
+  describe('Métodos de validación', () => {
+    describe('Validación de nombre de usuario', () => {
+      beforeEach(() => {
+        component.registerForm.patchValue({ username: '' });
+      });
+
+      it('debería validar la longitud mínima del nombre de usuario', () => {
+        component.registerForm.patchValue({ username: 'ab' });
+        expect(component.hasUsernameMinLength()).toBeFalse();
+
+        component.registerForm.patchValue({ username: 'abc' });
+        expect(component.hasUsernameMinLength()).toBeTrue();
+      });
+
+      it('debería validar la longitud máxima del nombre de usuario', () => {
+        component.registerForm.patchValue({ username: 'abcdefghijklm' });
+        expect(component.hasUsernameMaxLength()).toBeFalse();
+
+        component.registerForm.patchValue({ username: 'abcdefghijkl' });
+        expect(component.hasUsernameMaxLength()).toBeTrue();
+      });
+
+      it('debería validar los caracteres permitidos en el nombre de usuario', () => {
+        component.registerForm.patchValue({ username: 'test@user' });
+        expect(component.hasValidUsernameChars()).toBeFalse();
+
+        component.registerForm.patchValue({ username: 'testuser123' });
+        expect(component.hasValidUsernameChars()).toBeTrue();
+      });
+    });
+
+    describe('Validación de email', () => {
+      beforeEach(() => {
+        component.registerForm.patchValue({ email: '' });
+      });
+
+      it('debería validar el formato del email', () => {
+        component.registerForm.patchValue({ email: 'invalid-email' });
+        expect(component.hasValidEmailFormat()).toBeFalse();
+
+        component.registerForm.patchValue({ email: 'test@domain.com' });
+        expect(component.hasValidEmailFormat()).toBeTrue();
+      });
+
+      it('debería validar los TLDs permitidos', () => {
+        component.registerForm.patchValue({ email: 'test@domain.org' });
+        expect(component.hasValidTld()).toBeFalse();
+
+        component.registerForm.patchValue({ email: 'test@domain.com' });
+        expect(component.hasValidTld()).toBeTrue();
+
+        component.registerForm.patchValue({ email: 'test@domain.cl' });
+        expect(component.hasValidTld()).toBeTrue();
+
+        component.registerForm.patchValue({ email: 'test@domain.net' });
+        expect(component.hasValidTld()).toBeTrue();
+      });
+    });
+
+    describe('Validación de contraseña', () => {
+      beforeEach(() => {
+        component.registerForm.patchValue({ password: '' });
+      });
+
+      it('debería validar la longitud mínima de la contraseña', () => {
+        component.registerForm.patchValue({ password: '1234567' });
+        expect(component.hasMinLength()).toBeFalse();
+
+        component.registerForm.patchValue({ password: '12345678' });
+        expect(component.hasMinLength()).toBeTrue();
+      });
+
+      it('debería validar la longitud máxima de la contraseña', () => {
+        component.registerForm.patchValue({ password: 'a'.repeat(33) });
+        expect(component.hasMaxLength()).toBeFalse();
+
+        component.registerForm.patchValue({ password: 'a'.repeat(32) });
+        expect(component.hasMaxLength()).toBeTrue();
+      });
+
+      it('debería validar la presencia de letras en la contraseña', () => {
+        component.registerForm.patchValue({ password: '12345678' });
+        expect(component.hasLetter()).toBeFalse();
+
+        component.registerForm.patchValue({ password: '1234567a' });
+        expect(component.hasLetter()).toBeTrue();
+      });
+
+      it('debería validar la presencia de números en la contraseña', () => {
+        component.registerForm.patchValue({ password: 'abcdefgh' });
+        expect(component.hasNumber()).toBeFalse();
+
+        component.registerForm.patchValue({ password: 'abcdefg1' });
+        expect(component.hasNumber()).toBeTrue();
+      });
+
+      it('debería validar la presencia de caracteres especiales en la contraseña', () => {
+        component.registerForm.patchValue({ password: 'abc12345' });
+        expect(component.hasSpecialChar()).toBeFalse();
+
+        component.registerForm.patchValue({ password: 'abc12345!' });
+        expect(component.hasSpecialChar()).toBeTrue();
+      });
+    });
+  });
 });

@@ -103,12 +103,12 @@ export class RegisterComponent {
     if (this.registerForm.valid) {
       const { username, email, password } = this.registerForm.value;
       if (this.authService.register(username, password, email)) {
-        // this.router.navigate(['/login']);
         this.authService.login(email, password).subscribe({
           next: (response) => {
             this.router.navigate(['/forum']);
           },
           error: (error) => {
+            this.router.navigate(['/login']);
           }
         });
       } else {
@@ -153,9 +153,9 @@ export class RegisterComponent {
       if (usernameControl.errors['minlength']) {
         errors.push('El nombre de usuario debe tener al menos 3 caracteres');
       }
-      if (usernameControl.errors['maxlength']) {
-        errors.push('El nombre de usuario no debe exceder 32 caracteres');
-      }
+      // if (usernameControl.errors['maxlength']) {
+      //   errors.push('El nombre de usuario no debe exceder 32 caracteres');
+      // }
       if (usernameControl.errors['pattern']) {
         errors.push('El nombre de usuario no puede contener caracteres especiales');
       }

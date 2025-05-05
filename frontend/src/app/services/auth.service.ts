@@ -128,20 +128,8 @@ export class AuthService {
     localStorage.removeItem('token');
   }
 
-  isLoggedIn(): boolean {
-    return this.currentUserSubject.value !== null;
-  }
-
   getToken(): string | null {
     return localStorage.getItem('token');
-  }
-
-  getUser(): User | null {
-    return this.currentUserSubject.value;
-  }
-
-  isModerator(): boolean {
-    return this.currentUserSubject.value?.role === 'MODERATOR';
   }
 
   updateUsername(email: string, newUsername: string): Observable<any> {

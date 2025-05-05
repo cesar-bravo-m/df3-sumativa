@@ -283,35 +283,31 @@ export class ForumComponent implements OnInit, OnDestroy, AfterViewInit {
     this.bbsService.getThreadById(threadId).subscribe({
       next: (thread) => {
         if (this.threadModal.thread?.id === threadId) {
-          // Convert ThreadDto to ThreadDetails
           this.threadModal.thread = {
             id: thread.id,
             title: thread.title,
-            author: 'Usuario ' + thread.userId, // This should come from a user service
+            author: 'Usuario ' + thread.userId,
             content: thread.posts[0]?.content || '',
             lastActivity: thread.lastUpdatedAt,
             replies: thread.posts.length - 1,
-            views: 0, // This should come from the API
+            views: 0,
             createdAt: thread.createdAt,
             comments: thread.posts.slice(1).map(post => ({
               id: post.id,
-              author: 'Usuario ' + post.userId, // This should come from a user service
+              author: 'Usuario ' + post.userId,
               content: post.content,
               createdAt: post.createdAt
             }))
           };
         }
       },
-      error: (error) => {
-        console.error('Error loading thread details:', error);
-      }
+      // error: (error) => {
+      //   console.error('Error loading thread details:', error);
+      // }
     });
   }
 
   ngOnDestroy() {
-    if (this.commentSubscription) {
-      this.commentSubscription.unsubscribe();
-    }
     if (this.categoriesSubscription) {
       this.categoriesSubscription.unsubscribe();
     }
