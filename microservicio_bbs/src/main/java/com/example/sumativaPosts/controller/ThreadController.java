@@ -1,10 +1,12 @@
 package com.example.sumativaPosts.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,10 +17,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.sumativaPosts.dto.PostDto;
 import com.example.sumativaPosts.dto.ThreadDto;
 import com.example.sumativaPosts.dto.ThreadSummaryDto;
 import com.example.sumativaPosts.exception.UnauthorizedAccessException;
 import com.example.sumativaPosts.security.SecurityUtils;
+import com.example.sumativaPosts.service.PostService;
 import com.example.sumativaPosts.service.ThreadService;
 
 import jakarta.validation.Valid;
@@ -28,12 +32,17 @@ import jakarta.validation.Valid;
 public class ThreadController {
 
     private final ThreadService threadService;
+    private final PostService postService;
     private final SecurityUtils securityUtils;
+    private final JdbcTemplate jdbcTemplate;
+
 
     @Autowired
-    public ThreadController(ThreadService threadService, SecurityUtils securityUtils) {
+    public ThreadController(ThreadService threadService, SecurityUtils securityUtils, PostService postService, JdbcTemplate jdbcTemplate) {
         this.threadService = threadService;
         this.securityUtils = securityUtils;
+        this.postService = postService;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @GetMapping
@@ -59,8 +68,24 @@ public class ThreadController {
         }
         
         threadDto.setUserId(currentUserId);
-        
-        return ResponseEntity.status(HttpStatus.CREATED).body(threadService.createThread(threadDto));
+
+        ThreadDto newThread = threadService.createThread(threadDto);
+
+        PostDto firstPost = new PostDto();
+        firstPost.setContent(threadDto.getFirstPostContent());
+        firstPost.setUserId(currentUserId);
+        firstPost.setThreadId(newThread.getId());
+        postService.createPost(firstPost);
+
+        // Save new post with RAW SQL
+        String sql = "INSERT INTO posts (content, user_id, thread_id) VALUES (:content, :userId, :threadId)";
+        jdbcTemplate.update(sql, Map.of(
+            "content", firstPost.getContent(),
+            "userId", firstPost.getUserId(),
+            "threadId", firstPost.getThreadId()
+        ));
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(newThread);
     }
 
     @PutMapping("/{id}")

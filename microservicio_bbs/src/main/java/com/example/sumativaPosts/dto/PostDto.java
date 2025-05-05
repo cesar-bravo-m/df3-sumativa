@@ -20,7 +20,15 @@ public class PostDto {
     public PostDto() {
     }
     
-    public PostDto(Long id, String content, LocalDateTime createdAt, LocalDateTime lastUpdatedAt, Integer userId, Long threadId, String threadTitle) {
+    public PostDto(
+            Long id,
+            String content,
+            LocalDateTime createdAt,
+            LocalDateTime lastUpdatedAt,
+            Integer userId,
+            Long threadId,
+            String threadTitle
+        ) {
         this.id = id;
         this.content = content;
         this.createdAt = createdAt;

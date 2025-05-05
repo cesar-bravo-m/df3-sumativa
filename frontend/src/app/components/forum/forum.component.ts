@@ -193,9 +193,7 @@ export class ForumComponent implements OnInit, OnDestroy, AfterViewInit {
             createdAt: post.createdAt
           })) || []
         };
-        console.log("### threadDetails", threadDetails);
         this.threadModal.thread = threadDetails;
-        console.log("### opening");
         this.threadModal.open();
       },
       error: (err) => {

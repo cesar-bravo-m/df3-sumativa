@@ -17,12 +17,22 @@ public class ThreadDto {
     private Integer userId;
     private Long categoryId;
     private String categoryName;
+    private String firstPostContent;
     private List<PostDto> posts;
     
     public ThreadDto() {
     }
     
-    public ThreadDto(Long id, String title, LocalDateTime createdAt, LocalDateTime lastUpdatedAt, Integer userId, Long categoryId, String categoryName) {
+    public ThreadDto(
+            Long id,
+            String title,
+            LocalDateTime createdAt,
+            LocalDateTime lastUpdatedAt,
+            Integer userId,
+            Long categoryId,
+            String categoryName,
+            String firstPostContent
+        ) {
         this.id = id;
         this.title = title;
         this.createdAt = createdAt;
@@ -30,6 +40,15 @@ public class ThreadDto {
         this.userId = userId;
         this.categoryId = categoryId;
         this.categoryName = categoryName;
+        this.firstPostContent = firstPostContent;
+    }
+
+    public String getFirstPostContent() {
+        return firstPostContent;
+    }
+
+    public void setFirstPostContent(String firstPostContent) {
+        this.firstPostContent = firstPostContent;
     }
     
     public Long getId() {

@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { PostDto, ThreadDto } from '../../../services/bbs.service';
 
 @Component({
   selector: 'app-new-thread-modal',
@@ -123,7 +124,7 @@ import { FormsModule } from '@angular/forms';
 })
 export class NewThreadModalComponent {
   @Output() closeModal = new EventEmitter<void>();
-  @Output() createThread = new EventEmitter<{title: string, content: string}>();
+  @Output() createThread = new EventEmitter<ThreadDto>();
 
   isOpen = false;
   threadTitle = '';
@@ -144,9 +145,22 @@ export class NewThreadModalComponent {
     if (this.threadTitle && this.threadContent) {
       this.createThread.emit({
         title: this.threadTitle,
-        content: this.threadContent
-      });
+        posts: [
+          {
+            id: 0,
+            content: this.threadContent,
+            createdAt: new Date().toISOString(),
+            lastUpdatedAt: new Date().toISOString(),
+            userId: 0,
+            threadId: 0,
+            threadTitle: this.threadTitle
+          }
+        ]
+      } as ThreadDto);
       this.close();
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     }
   }
 }
