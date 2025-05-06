@@ -3,6 +3,7 @@ package com.example.sumativaPosts;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+// Microservicio del foro
 @SpringBootApplication
 public class SumativaPostsApplication {
 

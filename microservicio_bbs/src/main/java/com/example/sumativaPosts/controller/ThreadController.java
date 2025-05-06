@@ -1,7 +1,6 @@
 package com.example.sumativaPosts.controller;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.sumativaPosts.dto.PostDto;
 import com.example.sumativaPosts.dto.ThreadDto;
 import com.example.sumativaPosts.dto.ThreadSummaryDto;
 import com.example.sumativaPosts.exception.UnauthorizedAccessException;
@@ -70,20 +68,6 @@ public class ThreadController {
         threadDto.setUserId(currentUserId);
 
         ThreadDto newThread = threadService.createThread(threadDto);
-
-        PostDto firstPost = new PostDto();
-        firstPost.setContent(threadDto.getFirstPostContent());
-        firstPost.setUserId(currentUserId);
-        firstPost.setThreadId(newThread.getId());
-        postService.createPost(firstPost);
-
-        // Save new post with RAW SQL
-        String sql = "INSERT INTO posts (content, user_id, thread_id) VALUES (:content, :userId, :threadId)";
-        jdbcTemplate.update(sql, Map.of(
-            "content", firstPost.getContent(),
-            "userId", firstPost.getUserId(),
-            "threadId", firstPost.getThreadId()
-        ));
 
         return ResponseEntity.status(HttpStatus.CREATED).body(newThread);
     }
